@@ -128,12 +128,4 @@ The application uses the Huffman coding algorithm for compression:
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📬 Contact
-
-DeviceDidWhat - GitHub: [@DeviceDidWhat](https://github.com/DeviceDidWhat)
-
 Project Link: [https://github.com/DeviceDidWhat/Huffman-Compression-DSA-Project](https://github.com/DeviceDidWhat/Huffman-Compression-DSA-Project)
