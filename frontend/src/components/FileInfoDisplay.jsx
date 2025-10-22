@@ -9,31 +9,31 @@ const FileInfoDisplay = ({ fileName, fileSize, compressedSize, newFileName }) =>
       <h3 className="file-info-title">File Information</h3>
       
       <div className="file-info-item">
-        <span className="file-info-label">File Name:</span>
-        <span className="file-info-value">{fileName}</span>
+        <span className="file-info-label" style={{ color: '#555', fontWeight: 'bold' }}>File Name:</span>
+        <span className="file-info-value" style={{ color: '#333' }}>{fileName}</span>
       </div>
       
       <div className="file-info-item">
-        <span className="file-info-label">Original Size:</span>
-        <span className="file-info-value">{formatBytes(fileSize)}</span>
+        <span className="file-info-label" style={{ color: '#555', fontWeight: 'bold' }}>Original Size:</span>
+        <span className="file-info-value" style={{ color: '#333' }}>{formatBytes(fileSize)}</span>
       </div>
       
       {compressedSize > 0 && (
         <>
           <div className="file-info-item">
-            <span className="file-info-label">Compressed Size:</span>
-            <span className="file-info-value">{formatBytes(compressedSize)}</span>
+            <span className="file-info-label" style={{ color: '#555', fontWeight: 'bold' }}>Compressed Size:</span>
+            <span className="file-info-value" style={{ color: '#333' }}>{formatBytes(compressedSize)}</span>
           </div>
           
           <div className="file-info-item highlight">
-            <span className="file-info-label">Compression Ratio:</span>
-            <span className="file-info-value">{compressionRatio}%</span>
+            <span className="file-info-label" style={{ color: '#555', fontWeight: 'bold' }}>Compression Ratio:</span>
+            <span className="file-info-value" style={{ color: '#333' }}>{compressionRatio}%</span>
           </div>
           
           {newFileName && (
             <div className="file-info-item">
-              <span className="file-info-label">Output File:</span>
-              <span className="file-info-value">{newFileName}</span>
+              <span className="file-info-label" style={{ color: '#555', fontWeight: 'bold' }}>Output File:</span>
+              <span className="file-info-value" style={{ color: '#333' }}>{newFileName}</span>
             </div>
           )}
         </>

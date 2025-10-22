@@ -29,13 +29,12 @@ function App() {
   const handleFileChange = useCallback((selectedFile) => {
     if (selectedFile) {
       try {
-        validateFile(selectedFile); // Fixed: removed mode parameter
+        validateFile(selectedFile, mode);
         setFile(selectedFile);
         setError(null);
         setResult(null);
         setStatus('selected');
       } catch (err) {
-        // Fixed: catch the error thrown by validateFile
         setError(err.message);
         setFile(null);
         setStatus('idle');
@@ -43,7 +42,7 @@ function App() {
     }
   }, [mode]);
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!file) {
@@ -54,45 +53,110 @@ function App() {
     setLoading(true);
     setError(null);
     setResult(null);
-    setStatus('compressing');
+    setStatus('processing');
     setProgress(10);
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
-      const endpoint = mode === 'compress' ? '/api/compress' : '/api/decompress';
-      const response = await fetch(`${API_URL}${endpoint}`, {
-        method: 'POST',
-        body: formData
+      // Dynamically import the HuffmanCompressor
+      const { HuffmanCompressor } = await import('./lib/huffman.js');
+      const compressor = new HuffmanCompressor();
+      
+      setProgress(30);
+      
+      // Read file content
+      const fileContent = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = (e) => reject(new Error('Failed to read file'));
+        
+        if (mode === 'compress') {
+          reader.readAsText(file);
+        } else {
+          reader.readAsArrayBuffer(file);
+        }
       });
 
-      setProgress(70);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'An error occurred');
+      setProgress(50);
+      let result;
+      
+      if (mode === 'compress') {
+        // Compress text content
+        const compressed = compressor.compress(fileContent);
+        
+        // Create compressed file with metadata
+        const compressedFile = compressor.createCompressedFile(
+          compressed.encodedText,
+          compressed.serializedTree,
+          file.name
+        );
+        
+        result = {
+          fileName: file.name.replace(/\.[^/.]+$/, '') + '.huff',
+          originalSize: file.size,
+          compressedSize: compressedFile.actualSize,
+          compressionRatio: compressed.compressionRatio,
+          fileContent: compressedFile.buffer,
+          success: true
+        };
+      } else {
+        // Decompress content
+        const buffer = fileContent;
+        
+        try {
+          // Read compressed file metadata
+          const { encodedText, metadata } = compressor.readCompressedFile(buffer);
+          
+          // Decompress using the tree from metadata
+          const decompressedText = compressor.decompress(
+            encodedText,
+            metadata.tree,
+            metadata.padding
+          );
+          
+          result = {
+            fileName: metadata.originalName || file.name.replace('.huff', '.txt'),
+            originalSize: file.size,
+            compressedSize: decompressedText.length,
+            compressionRatio: ((file.size - decompressedText.length) / file.size * 100).toFixed(2),
+            fileContent: decompressedText,
+            success: true
+          };
+        } catch (decompressError) {
+          throw new Error('Failed to decompress file: ' + decompressError.message);
+        }
       }
 
-      const data = await response.json();
-      setResult(data);
+      setProgress(80);
+      
+      // Create download link for compressed/decompressed file
+      const blob = new Blob([result.fileContent], { 
+        type: mode === 'compress' ? 'application/octet-stream' : 'text/plain' 
+      });
+      const downloadUrl = URL.createObjectURL(blob);
+
+      setResult({
+        ...result,
+        downloadUrl,
+        mode
+      });
+
       setStatus('success');
       setProgress(100);
-      
+
       // Save to history
-      saveToHistory({
-        fileName: file.name,
-        originalSize: file.size,
-        compressedSize: data.size,
-        mode,
-        timestamp: new Date().toISOString(),
-        downloadPath: data.downloadPath
-      });
-      
-      // Update history state
-      setHistory(getCompressionHistory());
+      if (mode === 'compress') {
+        saveToHistory({
+          fileName: file.name,
+          originalSize: result.originalSize,
+          compressedSize: result.compressedSize,
+          compressionRatio: result.compressionRatio,
+          timestamp: new Date().toISOString(),
+          mode: mode
+        });
+      }
     } catch (err) {
-      setError(err.message || 'An error occurred');
+      console.error('Operation failed:', err);
+      setError(err.message || `${mode} failed`);
       setStatus('error');
     } finally {
       setLoading(false);
@@ -100,8 +164,23 @@ function App() {
   };
 
   const handleDownload = () => {
-    if (result && result.downloadPath) {
-      window.open(`${API_URL}${result.downloadPath}`, '_blank');
+    if (result && result.fileContent) {
+      // Use the actual compressed/decompressed content
+      const fileType = mode === 'compress' ? 'application/octet-stream' : 'text/plain';
+      const fileName = result.fileName || (mode === 'compress' 
+        ? (file?.name?.replace(/\.[^/.]+$/, '') || 'compressed') + '.huff'
+        : (file?.name?.replace(/\.huff$/, '') || 'decompressed') + '.txt');
+      
+      // Create and download the file
+      const blob = new Blob([result.fileContent], { type: fileType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
   };
 
@@ -201,20 +280,37 @@ function App() {
               {history.slice(0, 5).map((item, index) => (
                 <div key={index} className="history-item">
                   <div className="history-item-info">
-                    <div className="history-item-name">{item.fileName}</div>
+                    <div className="history-item-name">{item.fileName || 'Unknown file'}</div>
                     <div className="history-item-stats">
-                      {formatBytes(item.originalSize)} → {formatBytes(item.compressedSize)} 
-                      ({((1 - item.compressedSize / item.originalSize) * 100).toFixed(2)}%)
+                      {formatBytes(item.originalSize || 0)} → {formatBytes(item.compressedSize || 0)} 
+                      ({item.originalSize && item.compressedSize ? ((1 - item.compressedSize / item.originalSize) * 100).toFixed(2) : '0.00'}%)
                     </div>
                   </div>
-                  {item.downloadPath && (
-                    <button 
-                      className="history-download-btn"
-                      onClick={() => window.open(`${API_URL}${item.downloadPath}`, '_blank')}
-                    >
-                      Download
-                    </button>
-                  )}
+                  {/* <button 
+                    className="history-download-btn"
+                    onClick={() => {
+                      if (item.fileContent) {
+                        // Use the actual file content if available
+                        const fileType = item.mode === 'compress' ? 'application/octet-stream' : 'text/plain';
+                        const fileName = item.mode === 'compress' 
+                          ? (item.fileName?.replace(/\.[^/.]+$/, '') || 'compressed') + '.huff'
+                          : (item.fileName?.replace(/\.huff$/, '') || 'decompressed') + '.txt';
+                        
+                        // Create and download the file
+                        const blob = new Blob([item.fileContent], { type: fileType });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                      }
+                    }}
+                  >
+                    Download
+                  </button> */}
                 </div>
               ))}
             </div>

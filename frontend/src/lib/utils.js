@@ -19,27 +19,22 @@ export const readFileAsArrayBuffer = (file) => {
 };
 
 // Validate file type and size
-export const validateFile = (file) => {
+export const validateFile = (file, mode) => {
   // Check if file exists
   if (!file) {
     throw new Error('No file selected');
   }
 
-  // Check file type for compression (only .txt files)
-  if (file.name.endsWith('.txt')) {
-    // Check file size (limit to 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      throw new Error('File size exceeds 10MB limit');
-    }
-  } 
-  // Check file type for decompression (only .huff files)
-  else if (file.name.endsWith('.huff')) {
-    // Check file size (limit to 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      throw new Error('File size exceeds 10MB limit');
-    }
-  } else {
-    throw new Error('Invalid file type. Only .txt and .huff files are supported');
+  // Check file size (limit to 10MB)
+  if (file.size > 10 * 1024 * 1024) {
+    throw new Error('File size exceeds 10MB limit');
+  }
+
+  // Check file type based on mode
+  if (mode === 'compress' && !file.name.endsWith('.txt')) {
+    throw new Error('Please select a .txt file for compression');
+  } else if (mode === 'decompress' && !file.name.endsWith('.huff')) {
+    throw new Error('Please select a .huff file for decompression');
   }
 
   return true;
@@ -64,11 +59,19 @@ export const saveToHistory = (compressionData) => {
     // Get existing history
     const history = JSON.parse(localStorage.getItem('compressionHistory') || '[]');
     
-    // Add new entry with timestamp
-    history.unshift({
-      ...compressionData,
-      timestamp: new Date().toISOString()
-    });
+    // Ensure all required fields have values
+    const safeData = {
+      fileName: compressionData.fileName || 'Unknown file',
+      originalSize: compressionData.originalSize || 0,
+      compressedSize: compressionData.compressedSize || 0,
+      mode: compressionData.mode || 'compress',
+      timestamp: new Date().toISOString(),
+      fileContent: compressionData.fileContent || null,
+      downloadPath: compressionData.downloadPath || null
+    };
+    
+    // Add new entry
+    history.unshift(safeData);
     
     // Keep only the last 10 entries
     const trimmedHistory = history.slice(0, 10);

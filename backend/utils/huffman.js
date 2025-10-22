@@ -112,26 +112,35 @@ class HuffmanCoding {
 
   // Convert binary string to buffer
   binaryStringToBuffer(binaryString) {
-    const bytes = [];
+    // Calculate padding needed to make the binary string length a multiple of 8
     const padding = (8 - (binaryString.length % 8)) % 8;
-    binaryString = binaryString + '0'.repeat(padding);
-
-    for (let i = 0; i < binaryString.length; i += 8) {
-      const byte = binaryString.substr(i, 8);
-      bytes.push(parseInt(byte, 2));
+    const paddedBinary = binaryString + '0'.repeat(padding);
+    
+    // Convert each 8-bit chunk to a byte
+    const buffer = Buffer.alloc(Math.ceil(paddedBinary.length / 8));
+    for (let i = 0; i < paddedBinary.length; i += 8) {
+      const byte = paddedBinary.slice(i, i + 8);
+      buffer[i / 8] = parseInt(byte, 2);
     }
-
-    return { buffer: Buffer.from(bytes), padding };
+    
+    return { buffer, padding };
   }
 
   // Convert buffer to binary string
   bufferToBinaryString(buffer, padding) {
     let binaryString = '';
-    for (let byte of buffer) {
-      binaryString += byte.toString(2).padStart(8, '0');
+    
+    // Convert each byte to its binary representation
+    for (let i = 0; i < buffer.length; i++) {
+      binaryString += buffer[i].toString(2).padStart(8, '0');
     }
-    // Remove padding
-    return binaryString.slice(0, binaryString.length - padding);
+    
+    // Remove padding bits from the end
+    if (padding > 0 && binaryString.length >= padding) {
+      binaryString = binaryString.slice(0, -padding);
+    }
+    
+    return binaryString;
   }
 }
 

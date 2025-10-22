@@ -232,4 +232,28 @@ export class HuffmanCompressor {
       actualSize: actualCompressedSize
     };
   }
+
+  // Convert Uint8Array to binary string
+  uint8ArrayToBinaryString(bytes) {
+    let binaryString = '';
+    for (let i = 0; i < bytes.length; i++) {
+      binaryString += bytes[i].toString(2).padStart(8, '0');
+    }
+    return binaryString;
+  }
+  
+  readCompressedFile(buffer) {
+    const view = new DataView(buffer);
+    const metadataLength = view.getUint32(0);
+    const metadataBuffer = buffer.slice(4, 4 + metadataLength);
+    const metadataStr = new TextDecoder().decode(metadataBuffer);
+    const metadata = JSON.parse(metadataStr);
+    
+    const dataBuffer = buffer.slice(4 + metadataLength);
+    const dataBytes = new Uint8Array(dataBuffer);
+    const encodedText = this.uint8ArrayToBinaryString(dataBytes);
+    
+    return { encodedText, metadata };
+  }
+  
 }

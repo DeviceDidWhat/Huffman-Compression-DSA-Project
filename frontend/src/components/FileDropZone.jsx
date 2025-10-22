@@ -63,15 +63,15 @@ const FileDropZone = ({ onFileSelect, disabled }) => {
         accept=".txt,.huff"
       />
       <label htmlFor="file-input" className="file-label">
-        <div className="icon">📁</div>
-        <div className="text">
+        <div className="icon" style={{ fontSize: '3rem', color: '#4a6cf7' }}>📁</div>
+        <div className="text" style={{ fontSize: '1.2rem', fontWeight: 'bold', margin: '10px 0' }}>
           {isDragOver
             ? 'Drop file here'
             : disabled
             ? 'Processing...'
             : 'Drag & drop file here or click to browse'}
         </div>
-        <div className="hint">Supports .txt files for compression and .huff files for decompression</div>
+        <div className="hint" style={{ color: '#555', fontSize: '0.9rem' }}>Supports .txt files for compression and .huff files for decompression</div>
       </label>
     </div>
   );

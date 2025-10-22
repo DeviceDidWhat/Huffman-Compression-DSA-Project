@@ -1,59 +1,47 @@
 import React from 'react';
 
-const StatusCard = ({ status, progress, onRetry }) => {
-  const getStatusDisplay = () => {
+const StatusCard = ({ status, progress, error, onRetry }) => {
+  const renderContent = () => {
     switch (status) {
       case 'idle':
-        return null;
+        return <div className="status-message" style={{ color: '#f7f0f0ff', fontWeight: 'bold' }}>Select a file to begin</div>;
       case 'selected':
         return (
-          <div className="flex items-center space-x-2 text-green-600 dark:text-green-400">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-            </svg>
-            <span className="font-medium">File selected and ready for processing</span>
+          <div className="status-message" style={{ color: '#f7f0f0ff', fontWeight: 'bold' }}>
+            Ready to process
           </div>
         );
       case 'compressing':
         return (
-          <div className="space-y-2">
-            <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+          <>
+            <div className="status-message" style={{ color: '#f7f0f0ff', fontWeight: 'bold' }}>
+              Processing...
+            </div>
+            <div className="progress-bar">
               <div 
-                className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                className="progress-fill" 
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
-            <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-              <span>Processing...</span>
-              <span className="font-medium">{progress}%</span>
-            </div>
-          </div>
+          </>
         );
       case 'success':
         return (
-          <div className="flex items-center space-x-2 text-green-600 dark:text-green-400">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="font-medium">Processing completed successfully!</span>
+          <div className="status-message success" style={{ color: '#22c55e', fontWeight: 'bold' }}>
+            Completed successfully!
           </div>
         );
       case 'error':
         return (
-          <div className="space-y-3">
-            <div className="flex items-center space-x-2 text-red-600 dark:text-red-400">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="font-medium">Error occurred during processing</span>
+          <>
+            <div className="status-message error" style={{ color: '#ef4444', fontWeight: 'bold' }}>
+              Error occurred
             </div>
-            <button
-              onClick={onRetry}
-              className="w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:hover:bg-red-700"
-            >
+            <div className="error-message" style={{ color: '#333' }}>{error}</div>
+            <button className="retry-btn" onClick={onRetry} style={{ backgroundColor: '#4a6cf7', color: 'white', padding: '8px 16px', borderRadius: '4px', border: 'none', cursor: 'pointer', marginTop: '10px' }}>
               Try Again
             </button>
-          </div>
+          </>
         );
       default:
         return null;
@@ -62,7 +50,7 @@ const StatusCard = ({ status, progress, onRetry }) => {
 
   return (
     <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-      {getStatusDisplay()}
+      {renderContent()}
     </div>
   );
 };
