@@ -1,131 +1,147 @@
-# 🗜️ Huffman Compression Web App
+# Huffman Compression
 
-A full-stack web application that implements Huffman coding algorithm for text file compression and decompression. Built with React, Node.js, and Express.
+A web application for compressing and decompressing text files using the Huffman coding algorithm. Built with React and Vite.
 
-## 🌟 Features
+## About
 
-- **Text File Compression**: Compress .txt files using Huffman coding algorithm
-- **File Decompression**: Decompress .huff files back to their original content
-- **Real-time Progress**: Visual feedback during compression/decompression
-- **Compression History**: Track your file compression history
-- **Drag & Drop**: Easy file upload interface
-- **Compression Stats**: View compression ratio and file size details
-- **Dark Mode Support**: Comfortable viewing in any lighting condition
+Huffman coding is a lossless data compression algorithm that assigns variable-length codes to characters based on their frequency. More frequent characters get shorter codes, reducing overall file size.
 
-## 🛠️ Technology Stack
+This application provides a simple interface to:
+- Compress text files (.txt) to .huff format
+- Decompress .huff files back to text
+- View compression statistics and file size reductions
 
-### Frontend
-- React (Vite)
-- Tailwind CSS
-- Modern ES6+ JavaScript
+## Quick Start
 
-### Backend
-- Node.js
-- Express
-- Morgan (logging)
-- CORS
+### Prerequisites
+- Node.js 14+ and npm
 
-## 📋 Prerequisites
+### Installation
 
-Before you begin, ensure you have the following installed:
-- Node.js (v14.0.0 or higher)
-- npm (v6.0.0 or higher)
+```bash
+# Clone the repository
+git clone https://github.com/DeviceDidWhat/Huffman-Compression-DSA-Project.git
+cd Huffman-Compression-DSA-Project
 
-## 🚀 Getting Started
+# Install frontend dependencies
+cd frontend
+npm install
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/DeviceDidWhat/Huffman-Compression-DSA-Project.git
-   cd Huffman-Compression-DSA-Project
-   ```
+# Start development server
+npm run dev
+```
 
-2. **Install Backend Dependencies**
-   ```bash
-   cd backend
-   npm install
-   ```
+Open http://localhost:5173 in your browser.
 
-3. **Install Frontend Dependencies**
-   ```bash
-   cd ../frontend
-   npm install
-   ```
+### Backend (Optional)
 
-4. **Start the Backend Server**
-   ```bash
-   cd ../backend
-   npm start
-   # Server will start on http://localhost:5000
-   ```
+The project includes a Node.js/Express backend (currently unused by frontend):
 
-5. **Start the Frontend Development Server**
-   ```bash
-   cd ../frontend
-   npm run dev
-   # Vite dev server will start on http://localhost:5173
-   ```
+```bash
+# Install backend dependencies
+cd ../backend
+npm install
 
-## 💻 Usage
+# Start backend server
+npm start
+```
 
-1. **Compressing a File**
-   - Open the web app in your browser
-   - Drag and drop a .txt file or click to browse
-   - Click the "Compress" button
-   - Download the compressed .huff file
+Backend runs on http://localhost:5000
 
-2. **Decompressing a File**
-   - Switch to "Decompress" mode
+## Usage
+
+1. **Compress a file**
+   - Click "Compress" mode
+   - Drag & drop a .txt file or click to browse
+   - Click "Compress" button
+   - Download the resulting .huff file
+
+2. **Decompress a file**
+   - Click "Decompress" mode
    - Upload a .huff file
-   - Click the "Decompress" button
-   - Download the original text file
+   - Click "Decompress" button
+   - Download the restored text file
 
-## 🔧 Project Structure
+## How It Works
+
+### Compression
+1. Read input text and count character frequencies
+2. Build a Huffman tree using priority queue (min-heap)
+3. Generate binary codes for each character
+4. Encode text using these codes
+5. Save encoded data with tree metadata
+
+### Decompression
+1. Read compressed file and extract metadata
+2. Reconstruct Huffman tree from serialized data
+3. Decode binary stream back to original text
+4. Restore file with original name
+
+## Project Structure
 
 ```
-project/
-├── backend/
-│   ├── controllers/
-│   │   └── compressionController.js
-│   ├── middlewares/
-│   │   └── upload.js
-│   ├── routes/
-│   │   └── compression.js
-│   ├── utils/
-│   │   └── huffman.js
-│   └── server.js
-├── frontend/
+Huffman-Compression-DSA-Project/
+├── frontend/               # React application
 │   ├── src/
-│   │   ├── components/
-│   │   │   ├── AppHeader.jsx
-│   │   │   ├── FileDropZone.jsx
-│   │   │   ├── FileInfoDisplay.jsx
-│   │   │   └── StatusCard.jsx
-│   │   ├── lib/
-│   │   │   └── utils.js
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   └── index.html
+│   │   ├── components/     # React components
+│   │   ├── lib/           # Huffman algorithm + utils
+│   │   ├── App.jsx        # Main app component
+│   │   └── main.jsx       # Entry point
+│   └── package.json
+└── backend/               # Express API (optional)
+    ├── controllers/       # Compression endpoints
+    ├── routes/            # API routes
+    ├── middlewares/       # File upload handling
+    ├── utils/             # Server-side Huffman
+    └── server.js
 ```
 
-## 🧮 How It Works
+## Development
 
-The application uses the Huffman coding algorithm for compression:
+### Frontend Tech Stack
+- React 19 - UI library
+- Vite - Build tool and dev server
+- Tailwind CSS - Styling
+- Vanilla JavaScript - No TypeScript
 
-1. **Compression Process**:
-   - Analyzes character frequencies in the input text
-   - Builds a Huffman tree based on frequencies
-   - Generates binary codes for each character
-   - Encodes the text using these codes
-   - Saves the compressed data with metadata
+### Running Tests
 
-2. **Decompression Process**:
-   - Reads the metadata from the compressed file
-   - Reconstructs the Huffman codes
-   - Decodes the binary data back to text
-   - Restores the original file content
+Currently no automated tests. Run linter:
 
-## 🤝 Contributing
+```bash
+cd frontend
+npm run lint
+```
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Building for Production
 
-Project Link: [https://github.com/DeviceDidWhat/Huffman-Compression-DSA-Project](https://github.com/DeviceDidWhat/Huffman-Compression-DSA-Project)
+```bash
+cd frontend
+npm run build
+```
+
+Output will be in `frontend/dist/`
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run linting: `npm run lint`
+5. Submit a pull request
+
+## Current Status
+
+- Frontend: Fully functional with client-side compression
+- Backend: Implemented but not connected to frontend
+- Future work: Integrate backend API, add tests, improve compression speed
+
+## License
+
+ISC
+
+## Links
+
+Repository: https://github.com/DeviceDidWhat/Huffman-Compression-DSA-Project
