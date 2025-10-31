@@ -20,17 +20,16 @@
 }
 
 /* Main container */
-/* Main container */
 .container {
   width: 100%;
-  min-height: 100%; /* Use min-height to allow content to grow */
-  margin: 0;
-  padding: 1rem;
+  max-width: 900px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  /* Ensure container can scroll if content overflows */
-  overflow-y: auto; /* Allow vertical scrolling */
+  overflow-y: auto;
 }
 
 /* Card styling */
