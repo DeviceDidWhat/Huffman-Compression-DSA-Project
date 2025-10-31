@@ -20,17 +20,16 @@
 }
 
 /* Main container */
-/* Main container */
 .container {
   width: 100%;
-  min-height: 100%; /* Use min-height to allow content to grow */
-  margin: 0;
-  padding: 1rem;
+  max-width: 900px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  /* Ensure container can scroll if content overflows */
-  overflow-y: auto; /* Allow vertical scrolling */
+  overflow-y: auto;
 }
 
 /* Card styling */
@@ -376,4 +375,382 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.85rem;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - ALL SCREEN SIZES
+   ============================================ */
+
+/* Large Desktop (1200px and up) */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1000px;
+    padding: 2.5rem 2rem;
+  }
+
+  .app-title {
+    font-size: 2.2rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+}
+
+/* Desktop (992px to 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .container {
+    max-width: 900px;
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* Tablet (768px to 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .container {
+    max-width: 95%;
+    padding: 1.5rem;
+  }
+
+  .app-title {
+    font-size: 2rem;
+  }
+
+  .app-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .card {
+    padding: 1.25rem;
+  }
+
+  .mode-btn {
+    padding: 0.875rem;
+    font-size: 1.05rem;
+  }
+
+  .file-label .icon {
+    font-size: 2.25rem;
+  }
+
+  .file-label .text {
+    font-size: 1.05rem;
+  }
+
+  .submit-btn {
+    padding: 0.875rem 2rem;
+    font-size: 1.05rem;
+  }
+}
+
+/* Mobile Large (576px to 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .container {
+    max-width: 100%;
+    padding: 1.25rem;
+  }
+
+  .app-header {
+    margin-bottom: 1rem;
+  }
+
+  .app-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .app-title {
+    font-size: 1.75rem;
+  }
+
+  .app-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .mode-btn {
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .file-label .icon {
+    font-size: 2.1rem;
+  }
+
+  .file-label .text {
+    font-size: 1rem;
+  }
+
+  .file-label .hint {
+    font-size: 0.85rem;
+  }
+
+  .submit-btn {
+    padding: 0.875rem;
+    font-size: 1rem;
+  }
+
+  .file-info-title {
+    font-size: 1.15rem;
+  }
+}
+
+/* Mobile Small (up to 575px) */
+@media (max-width: 575px) {
+  .container {
+    padding: 1rem 0.75rem;
+  }
+
+  .app-header {
+    margin-bottom: 0.75rem;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .app-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 0.75rem;
+  }
+
+  .app-title {
+    font-size: 1.5rem;
+  }
+
+  .app-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .card {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .mode-selector {
+    flex-direction: row;
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+
+  .mode-btn {
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  .dropzone {
+    padding: 0.75rem;
+  }
+
+  .file-label .icon {
+    font-size: 2rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .file-label .text {
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .file-label .hint {
+    font-size: 0.8rem;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 0.875rem;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .download-btn {
+    width: 100%;
+    padding: 0.875rem;
+    font-size: 1rem;
+  }
+
+  .file-info {
+    margin-bottom: 0.75rem;
+  }
+
+  .file-info-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .file-info-item {
+    font-size: 0.9rem;
+    padding: 0.4rem 0;
+  }
+
+  .info-box {
+    padding: 0.875rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .info-box h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .info-box p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 0.4rem;
+  }
+
+  .history-container {
+    margin-top: 0.75rem;
+  }
+
+  .history-container h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .history-item {
+    padding: 0.65rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .history-item-name {
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .history-item-stats {
+    font-size: 0.8rem;
+  }
+
+  .status-ready, .status-processing, .status-success, .status-error {
+    padding: 0.65rem;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .status-icon {
+    font-size: 1rem;
+    margin-right: 0.4rem;
+  }
+
+  .progress-bar {
+    margin-right: 0.4rem;
+  }
+
+  .retry-button {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+}
+
+/* Extra Small Mobile (up to 480px) */
+@media (max-width: 480px) {
+  .container {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .card {
+    padding: 0.6rem;
+    border-radius: 6px;
+  }
+
+  .app-header {
+    margin-bottom: 0.6rem;
+  }
+
+  .app-icon {
+    width: 36px;
+    height: 36px;
+    margin-right: 0.6rem;
+  }
+
+  .app-title {
+    font-size: 1.3rem;
+  }
+
+  .app-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .mode-btn {
+    padding: 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .file-label .icon {
+    font-size: 1.75rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .file-label .text {
+    font-size: 0.9rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .file-label .hint {
+    font-size: 0.75rem;
+  }
+
+  .submit-btn, .download-btn {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .file-info-title {
+    font-size: 1rem;
+  }
+
+  .file-info-item {
+    font-size: 0.85rem;
+    padding: 0.35rem 0;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .info-box {
+    padding: 0.75rem;
+    border-radius: 6px;
+  }
+
+  .info-box h3 {
+    font-size: 1rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .info-box p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-bottom: 0.35rem;
+  }
+
+  .history-container h3 {
+    font-size: 1rem;
+  }
+
+  .history-item {
+    padding: 0.5rem;
+  }
+
+  .history-item-name {
+    font-size: 0.85rem;
+  }
+
+  .history-item-stats {
+    font-size: 0.75rem;
+  }
+
+  .status-ready, .status-processing, .status-success, .status-error {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .retry-button {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.8rem;
+  }
 }
