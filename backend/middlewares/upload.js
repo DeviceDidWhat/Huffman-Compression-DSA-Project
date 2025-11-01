@@ -2,14 +2,12 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure uploads directory exists
-const uploadDir = path.join(__dirname, '../uploads');
+const uploadDir = path.join(__dirname, '../uploads'); // Ensure uploads directory exists
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configure storage
-const storage = multer.diskStorage({
+const storage = multer.diskStorage({ // Configure storage
   destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
@@ -19,8 +17,7 @@ const storage = multer.diskStorage({
   }
 });
 
-// File filter for text files
-const fileFilter = (req, file, cb) => {
+const fileFilter = (req, file, cb) => { // File filter for text files
   const allowedMimes = ['text/plain', 'application/octet-stream'];
   
   if (allowedMimes.includes(file.mimetype) || 
@@ -36,7 +33,7 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
+    fileSize: 100 * 1024 * 1024 // 100MB limit
   }
 });
 

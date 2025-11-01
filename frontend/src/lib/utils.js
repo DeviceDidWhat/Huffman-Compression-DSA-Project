@@ -1,5 +1,4 @@
-// Read file as text
-export const readFileAsText = (file) => {
+export const readFileAsText = (file) => { // read file as text
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (event) => resolve(event.target.result);
@@ -8,8 +7,7 @@ export const readFileAsText = (file) => {
   });
 };
 
-// Read file as ArrayBuffer
-export const readFileAsArrayBuffer = (file) => {
+export const readFileAsArrayBuffer = (file) => { // read file as ArrayBuffer
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (event) => resolve(event.target.result);
@@ -18,20 +16,17 @@ export const readFileAsArrayBuffer = (file) => {
   });
 };
 
-// Validate file type and size
-export const validateFile = (file, mode) => {
-  // Check if file exists
+export const validateFile = (file, mode) => { // validate file type and size
   if (!file) {
     throw new Error('No file selected');
   }
 
-  // Check file size (limit to 10MB)
-  if (file.size > 10 * 1024 * 1024) {
-    throw new Error('File size exceeds 10MB limit');
+ 
+  if (file.size > 100 * 1024 * 1024) {  // Check file size (limit to 100MB)
+    throw new Error('File size exceeds 100MB limit');
   }
 
-  // Check file type based on mode
-  if (mode === 'compress' && !file.name.endsWith('.txt')) {
+  if (mode === 'compress' && !file.name.endsWith('.txt')) { // Check file type based on mode
     throw new Error('Please select a .txt file for compression');
   } else if (mode === 'decompress' && !file.name.endsWith('.huff')) {
     throw new Error('Please select a .huff file for decompression');
@@ -40,8 +35,7 @@ export const validateFile = (file, mode) => {
   return true;
 };
 
-// Format bytes to human-readable format
-export const formatBytes = (bytes, decimals = 2) => {
+export const formatBytes = (bytes, decimals = 2) => { // Format bytes to human-readable format
   if (bytes === 0) return '0 Bytes';
 
   const k = 1024;
@@ -53,14 +47,10 @@ export const formatBytes = (bytes, decimals = 2) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
 
-// Save compression history to localStorage
-export const saveToHistory = (compressionData) => {
-  try {
-    // Get existing history
-    const history = JSON.parse(localStorage.getItem('compressionHistory') || '[]');
-    
-    // Ensure all required fields have values
-    const safeData = {
+export const saveToHistory = (compressionData) => { // Save compression history to localStorage
+  try {   
+    const history = JSON.parse(localStorage.getItem('compressionHistory') || '[]'); // Get existing history  
+    const safeData = { // Ensure all required fields have values
       fileName: compressionData.fileName || 'Unknown file',
       originalSize: compressionData.originalSize || 0,
       compressedSize: compressionData.compressedSize || 0,
@@ -68,23 +58,16 @@ export const saveToHistory = (compressionData) => {
       timestamp: new Date().toISOString(),
       fileContent: compressionData.fileContent || null,
       downloadPath: compressionData.downloadPath || null
-    };
-    
-    // Add new entry
-    history.unshift(safeData);
-    
-    // Keep only the last 10 entries
-    const trimmedHistory = history.slice(0, 10);
-    
-    // Save back to localStorage
-    localStorage.setItem('compressionHistory', JSON.stringify(trimmedHistory));
+    };  
+    history.unshift(safeData);  // Add new entry at the beginning  
+    const trimmedHistory = history.slice(0, 10); // Keep only the last 10 entries
+    localStorage.setItem('compressionHistory', JSON.stringify(trimmedHistory));     // Save back to localStorage
   } catch (error) {
     console.error('Failed to save to history:', error);
   }
 };
 
-// Get compression history from localStorage
-export const getCompressionHistory = () => {
+export const getCompressionHistory = () => { // Get compression history from localStorage
   try {
     return JSON.parse(localStorage.getItem('compressionHistory') || '[]');
   } catch (error) {
@@ -93,7 +76,6 @@ export const getCompressionHistory = () => {
   }
 };
 
-// Clear compression history
-export const clearCompressionHistory = () => {
+export const clearCompressionHistory = () => { // Clear compression history
   localStorage.removeItem('compressionHistory');
 };

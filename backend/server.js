@@ -10,18 +10,18 @@ const port = process.env.PORT || 5000;
 
 // Middleware
 app.use(morgan('dev')); // Logging
-app.use(cors({
+app.use(cors({   // Had to enable CORS for frontend-backend communication
   origin: 'http://localhost:5173', // Vite default port
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '100mb' }));
 
-// Routes
-app.use('/api', compressionRoutes);
 
-// Download endpoint
-app.get('/download/:filename', (req, res) => {
+app.use('/api', compressionRoutes); // Routes defined in compression.js
+
+
+app.get('/download/:filename', (req, res) => { // Download api endpoint for files
   const filename = req.params.filename;
   const filePath = path.join(__dirname, 'uploads', filename);
   
@@ -30,9 +30,8 @@ app.get('/download/:filename', (req, res) => {
       if (err) {
         console.error('Download error:', err);
         res.status(500).json({ success: false, message: 'Download failed' });
-      }
-      // Clean up file after download
-      setTimeout(() => {
+      }     
+      setTimeout(() => { // Clean up file after download
         fs.unlink(filePath, (err) => {
           if (err) console.error('File cleanup error:', err);
         });
@@ -43,8 +42,8 @@ app.get('/download/:filename', (req, res) => {
   }
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
+
+app.use((err, req, res, next) => { // Global Error handling middleware
   console.error(err.stack);
   res.status(500).json({
     success: false,
@@ -53,12 +52,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Health check
-app.get('/health', (req, res) => {
+
+app.get('/health', (req, res) => {  // Health check endpoint api
   res.json({ status: 'ok', message: 'Huffman Compression API is running' });
 });
 
-// Start server
-app.listen(port, () => {
+
+app.listen(port, () => { // For Starting the server at port 5000
   console.log(`Huffman Compression API running at http://localhost:${port}`);
 });
