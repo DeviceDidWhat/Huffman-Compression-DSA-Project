@@ -7,6 +7,7 @@ A web application for compressing and decompressing text files using the Huffman
 Huffman coding is a lossless data compression algorithm that assigns variable-length codes to characters based on their frequency. More frequent characters get shorter codes, reducing overall file size.
 
 This application provides a simple interface to:
+
 - Compress text files (.txt) to .huff format
 - Decompress .huff files back to text
 - View compression statistics and file size reductions
@@ -14,6 +15,7 @@ This application provides a simple interface to:
 ## Quick Start
 
 ### Prerequisites
+
 - Node.js 14+ and npm
 
 ### Installation
@@ -51,6 +53,7 @@ Backend runs on http://localhost:5000
 ## Usage
 
 1. **Compress a file**
+
    - Click "Compress" mode
    - Drag & drop a .txt file or click to browse
    - Click "Compress" button
@@ -65,6 +68,7 @@ Backend runs on http://localhost:5000
 ## How It Works
 
 ### Compression
+
 1. Read input text and count character frequencies
 2. Build a Huffman tree using priority queue (min-heap)
 3. Generate binary codes for each character
@@ -72,6 +76,7 @@ Backend runs on http://localhost:5000
 5. Save encoded data with tree metadata
 
 ### Decompression
+
 1. Read compressed file and extract metadata
 2. Reconstruct Huffman tree from serialized data
 3. Decode binary stream back to original text
@@ -99,6 +104,7 @@ Huffman-Compression-DSA-Project/
 ## Development
 
 ### Frontend Tech Stack
+
 - React 19 - UI library
 - Vite - Build tool and dev server
 - Tailwind CSS - Styling
@@ -140,7 +146,7 @@ Contributions are welcome! Please:
 
 ## License
 
-ISC
+MIT License - see LICENSE file for details.
 
 ## Links
 
