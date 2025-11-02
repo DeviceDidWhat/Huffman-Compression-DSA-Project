@@ -286,31 +286,6 @@ function App() {
                       ({item.originalSize && item.compressedSize ? ((1 - item.compressedSize / item.originalSize) * 100).toFixed(2) : '0.00'}%)
                     </div>
                   </div>
-                  {/* <button 
-                    className="history-download-btn"
-                    onClick={() => {
-                      if (item.fileContent) {
-                        // Use the actual file content if available
-                        const fileType = item.mode === 'compress' ? 'application/octet-stream' : 'text/plain';
-                        const fileName = item.mode === 'compress' 
-                          ? (item.fileName?.replace(/\.[^/.]+$/, '') || 'compressed') + '.huff'
-                          : (item.fileName?.replace(/\.huff$/, '') || 'decompressed') + '.txt';
-                        
-                        // Create and download the file
-                        const blob = new Blob([item.fileContent], { type: fileType });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = fileName;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                      }
-                    }}
-                  >
-                    Download
-                  </button> */}
                 </div>
               ))}
             </div>

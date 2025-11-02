@@ -3,15 +3,55 @@ import React from 'react';
 const AppHeader = () => {
   return (
     <div className="app-header">
-      <div className="app-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#4a6cf7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-        </svg>
+      <div className="header-content">
+        <div className="logo-section">
+          <div className="logo-container">
+            <svg 
+              className="logo-icon" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path 
+                d="M12 2L2 7L12 12L22 7L12 2Z" 
+                className="logo-path"
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+              <path 
+                d="M2 17L12 22L22 17" 
+                className="logo-path"
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+              <path 
+                d="M2 12L12 17L22 12" 
+                className="logo-path"
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <div className="title-section">
+            <h1 className="main-title">
+              <span className="title-gradient">Huffman</span>
+              <span className="title-light">Compress</span>
+            </h1>
+            <p className="subtitle">
+              <span className="subtitle-dot">•</span>
+              Lossless Data Compression
+              <span className="subtitle-dot">•</span>
+            </p>
+          </div>
+        </div>
+        <div className="header-badge">
+          <span className="badge-text">DSA Project</span>
+        </div>
       </div>
-      <div>
-        <h1 className="app-title">Huffman Compression</h1>
-        <p className="app-subtitle">DSA Project - Lossless Text Compression</p>
-      </div>
+      <div className="header-divider"></div>
     </div>
   );
 };
