@@ -1104,14 +1104,6 @@ body::before {
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
-  transition: all 0.3s ease-in-out; /* ✅ Smooth animation */
-}
-
-.info-box:hover {
-  transform: translateY(-6px) scale(1.03);  /* ✅ slight lift */
-  border-color: var(--primary);
-  box-shadow: 0 0 18px rgba(99, 102, 241, 0.6),
-              0 0 35px rgba(99, 102, 241, 0.35); /* 🔥 Glow */
 }
 
 
