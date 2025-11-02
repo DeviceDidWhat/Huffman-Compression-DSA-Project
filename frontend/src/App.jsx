@@ -146,7 +146,7 @@ function App() {
       // Save to history
       if (mode === 'compress') {
         saveToHistory({
-          fileName: file.name,
+              fileName: file.name,
           originalSize: result.originalSize,
           compressedSize: result.compressedSize,
           compressionRatio: result.compressionRatio,
@@ -223,10 +223,13 @@ function App() {
             </button>
           </div>
 
-          <FileDropZone 
+         <FileDropZone 
             onFileSelect={handleFileChange} 
-            disabled={loading} 
+            disabled={loading}
+            mode={mode}   // ✅ add this line
           />
+
+
 
           <StatusCard 
             status={status} 
