@@ -274,7 +274,7 @@ function App() {
                   setStatus('idle');
                 }}
               >
-                📝 Text
+                Text
               </button>
               <button
                 className={`mode-btn ${fileType === 'image' ? 'active' : ''}`}
@@ -286,7 +286,7 @@ function App() {
                   setStatus('idle');
                 }}
               >
-                🖼️ Image
+                Image
               </button>
             </div>
           </div>
