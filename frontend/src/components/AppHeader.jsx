@@ -1,5 +1,5 @@
-import React from 'react';
-import ThemeToggleButton from './ThemeToggleButton';
+import React from "react";
+import ThemeToggleButton from "./ThemeToggleButton";
 
 const AppHeader = () => {
   return (
@@ -7,31 +7,31 @@ const AppHeader = () => {
       <div className="header-content">
         <div className="logo-section">
           <div className="logo-container">
-            <svg 
-              className="logo-icon" 
-              viewBox="0 0 24 24" 
-              fill="none" 
+            <svg
+              className="logo-icon"
+              viewBox="0 0 24 24"
+              fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path 
-                d="M12 2L2 7L12 12L22 7L12 2Z" 
+              <path
+                d="M12 2L2 7L12 12L22 7L12 2Z"
                 className="logo-path"
-                strokeWidth="2" 
-                strokeLinecap="round" 
+                strokeWidth="2"
+                strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              <path 
-                d="M2 17L12 22L22 17" 
+              <path
+                d="M2 17L12 22L22 17"
                 className="logo-path"
-                strokeWidth="2" 
-                strokeLinecap="round" 
+                strokeWidth="2"
+                strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              <path 
-                d="M2 12L12 17L22 12" 
+              <path
+                d="M2 12L12 17L22 12"
                 className="logo-path"
-                strokeWidth="2" 
-                strokeLinecap="round" 
+                strokeWidth="2"
+                strokeLinecap="round"
                 strokeLinejoin="round"
               />
             </svg>
