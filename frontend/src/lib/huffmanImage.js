@@ -23,10 +23,10 @@ class HuffmanImageCompressor {
 
       reader.onload = (e) => {
         img.onload = () => {
-          const canvas = document.createElement('canvas');
+          const canvas = document.createElement("canvas");
           canvas.width = img.width;
           canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
+          const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0);
 
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -56,7 +56,7 @@ class HuffmanImageCompressor {
   quantizeImage(imageData) {
     const quantized = new Uint8Array(imageData.length);
     for (let i = 0; i < imageData.length; i += 4) {
-      quantized[i] = this.quantizeColor(imageData[i]);     // R
+      quantized[i] = this.quantizeColor(imageData[i]); // R
       quantized[i + 1] = this.quantizeColor(imageData[i + 1]); // G
       quantized[i + 2] = this.quantizeColor(imageData[i + 2]); // B
       quantized[i + 3] = imageData[i + 3]; // Alpha - keep unchanged
@@ -138,16 +138,16 @@ class HuffmanImageCompressor {
   }
 
   // Generate Huffman codes from tree
-  generateCodes(node, code = '', codes = {}) {
+  generateCodes(node, code = "", codes = {}) {
     if (!node) return codes;
 
     if (node.value !== null) {
-      codes[node.value] = code || '0'; // Handle single-node tree
+      codes[node.value] = code || "0"; // Handle single-node tree
       return codes;
     }
 
-    this.generateCodes(node.left, code + '0', codes);
-    this.generateCodes(node.right, code + '1', codes);
+    this.generateCodes(node.left, code + "0", codes);
+    this.generateCodes(node.right, code + "1", codes);
     return codes;
   }
 
@@ -195,7 +195,7 @@ class HuffmanImageCompressor {
 
   // Encode data using Huffman codes
   encodeData(data, codes) {
-    let bitString = '';
+    let bitString = "";
     for (const value of data) {
       bitString += codes[value];
     }
@@ -205,7 +205,7 @@ class HuffmanImageCompressor {
   // Convert bit string to Uint8Array
   bitStringToBytes(bitString) {
     const padding = (8 - (bitString.length % 8)) % 8;
-    bitString += '0'.repeat(padding);
+    bitString += "0".repeat(padding);
 
     const bytes = new Uint8Array(bitString.length / 8);
     for (let i = 0; i < bytes.length; i++) {
@@ -216,9 +216,9 @@ class HuffmanImageCompressor {
 
   // Convert bytes back to bit string
   bytesToBitString(bytes, padding) {
-    let bitString = '';
+    let bitString = "";
     for (const byte of bytes) {
-      bitString += byte.toString(2).padStart(8, '0');
+      bitString += byte.toString(2).padStart(8, "0");
     }
     return bitString.slice(0, -padding || bitString.length);
   }
@@ -234,7 +234,7 @@ class HuffmanImageCompressor {
     }
 
     for (const bit of bitString) {
-      current = bit === '0' ? current.left : current.right;
+      current = bit === "0" ? current.left : current.right;
 
       if (current.value !== null) {
         decoded.push(current.value);
@@ -289,12 +289,12 @@ class HuffmanImageCompressor {
 
     // Create metadata
     const metadata = {
-      magic: 'HUFFIMG',
+      magic: "HUFFIMG",
       version: 1,
       width,
       height,
       channels: 4, // RGBA
-      originalName: file.name.replace(/\.(png|jpg|jpeg)$/i, ''),
+      originalName: file.name.replace(/\.(png|jpg|jpeg)$/i, ""),
       rTree: rChannel.tree,
       gTree: gChannel.tree,
       bTree: bChannel.tree,
@@ -345,7 +345,10 @@ class HuffmanImageCompressor {
     // Calculate compression stats
     const originalSize = width * height * 4;
     const compressedSize = result.length;
-    const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(2);
+    const compressionRatio = (
+      (1 - compressedSize / originalSize) *
+      100
+    ).toFixed(2);
 
     return {
       data: result,
@@ -374,21 +377,29 @@ class HuffmanImageCompressor {
           const metadata = JSON.parse(metadataJson);
 
           // Verify magic bytes
-          if (metadata.magic !== 'HUFFIMG') {
-            throw new Error('Invalid .huffimg file format');
+          if (metadata.magic !== "HUFFIMG") {
+            throw new Error("Invalid .huffimg file format");
           }
 
           // Extract compressed channel data
           let offset = 4 + metadataLength;
 
-          const rBytes = data.slice(offset, offset + Math.ceil((metadata.rLength * 9) / 8)); // Rough estimate
+          const rBytes = data.slice(
+            offset,
+            offset + Math.ceil((metadata.rLength * 9) / 8)
+          ); // Rough estimate
           offset += rBytes.length;
 
           // For simplicity, read remaining bytes and split
           const remainingData = data.slice(4 + metadataLength);
 
           // Decode each channel
-          const decodeChannel = (channelData, treeSerialized, padding, length) => {
+          const decodeChannel = (
+            channelData,
+            treeSerialized,
+            padding,
+            length
+          ) => {
             const tree = this.deserializeTree(treeSerialized);
             const bitString = this.bytesToBitString(channelData, padding);
             const decoded = this.decodeData(bitString, tree, length);
@@ -409,14 +420,34 @@ class HuffmanImageCompressor {
 
           offset = 4 + metadataLength;
           const rBytesActual = remainingData.slice(0, rByteLength);
-          const gBytesActual = remainingData.slice(rByteLength, rByteLength + gByteLength);
-          const bBytesActual = remainingData.slice(rByteLength + gByteLength, rByteLength + gByteLength + bByteLength);
-          const aBytesActual = remainingData.slice(rByteLength + gByteLength + bByteLength);
+          const gBytesActual = remainingData.slice(
+            rByteLength,
+            rByteLength + gByteLength
+          );
+          const bBytesActual = remainingData.slice(
+            rByteLength + gByteLength,
+            rByteLength + gByteLength + bByteLength
+          );
+          const aBytesActual = remainingData.slice(
+            rByteLength + gByteLength + bByteLength
+          );
 
-          const rBitString = this.bytesToBitString(rBytesActual, metadata.rPadding);
-          const gBitString = this.bytesToBitString(gBytesActual, metadata.gPadding);
-          const bBitString = this.bytesToBitString(bBytesActual, metadata.bPadding);
-          const aBitString = this.bytesToBitString(aBytesActual, metadata.aPadding);
+          const rBitString = this.bytesToBitString(
+            rBytesActual,
+            metadata.rPadding
+          );
+          const gBitString = this.bytesToBitString(
+            gBytesActual,
+            metadata.gPadding
+          );
+          const bBitString = this.bytesToBitString(
+            bBytesActual,
+            metadata.bPadding
+          );
+          const aBitString = this.bytesToBitString(
+            aBytesActual,
+            metadata.aPadding
+          );
 
           const deltaR = this.decodeData(rBitString, rTree, metadata.rLength);
           const deltaG = this.decodeData(gBitString, gTree, metadata.gLength);
@@ -430,7 +461,9 @@ class HuffmanImageCompressor {
           const channelA = this.deltaReverse(deltaA);
 
           // Reconstruct image data
-          const imageData = new Uint8ClampedArray(metadata.width * metadata.height * 4);
+          const imageData = new Uint8ClampedArray(
+            metadata.width * metadata.height * 4
+          );
           for (let i = 0; i < channelR.length; i++) {
             imageData[i * 4] = channelR[i];
             imageData[i * 4 + 1] = channelG[i];
@@ -439,11 +472,15 @@ class HuffmanImageCompressor {
           }
 
           // Create canvas and render image
-          const canvas = document.createElement('canvas');
+          const canvas = document.createElement("canvas");
           canvas.width = metadata.width;
           canvas.height = metadata.height;
-          const ctx = canvas.getContext('2d');
-          const imgData = new ImageData(imageData, metadata.width, metadata.height);
+          const ctx = canvas.getContext("2d");
+          const imgData = new ImageData(
+            imageData,
+            metadata.width,
+            metadata.height
+          );
           ctx.putImageData(imgData, 0, 0);
 
           // Convert to blob
@@ -457,14 +494,13 @@ class HuffmanImageCompressor {
               decompressedSize: blob.size,
               imageUrl: URL.createObjectURL(blob),
             });
-          }, 'image/png');
-
+          }, "image/png");
         } catch (error) {
           reject(new Error(`Decompression failed: ${error.message}`));
         }
       };
 
-      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.onerror = () => reject(new Error("Failed to read file"));
       reader.readAsArrayBuffer(file);
     });
   }
