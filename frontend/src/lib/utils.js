@@ -21,15 +21,24 @@ export const validateFile = (file, mode) => { // validate file type and size
     throw new Error('No file selected');
   }
 
- 
+
   if (file.size > 100 * 1024 * 1024) {  // Check file size (limit to 100MB)
     throw new Error('File size exceeds 100MB limit');
   }
 
-  if (mode === 'compress' && !file.name.endsWith('.txt')) { // Check file type based on mode
+  // Check file type based on mode
+  if (mode === 'compress' && !file.name.endsWith('.txt')) {
     throw new Error('Please select a .txt file for compression');
   } else if (mode === 'decompress' && !file.name.endsWith('.huff')) {
     throw new Error('Please select a .huff file for decompression');
+  } else if (mode === 'compress-image') {
+    const validImageTypes = ['.png', '.jpg', '.jpeg'];
+    const hasValidExtension = validImageTypes.some(ext => file.name.toLowerCase().endsWith(ext));
+    if (!hasValidExtension) {
+      throw new Error('Please select a .png, .jpg, or .jpeg file for image compression');
+    }
+  } else if (mode === 'decompress-image' && !file.name.endsWith('.huffimg')) {
+    throw new Error('Please select a .huffimg file for image decompression');
   }
 
   return true;

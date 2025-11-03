@@ -40,7 +40,12 @@ const FileDropZone = ({ onFileSelect, disabled, mode }) => {
           id="file-input"
           className="file-input"
           disabled={disabled}
-          accept={mode === "compress" ? ".txt" : ".huff"}   // <-- Dynamic file filter
+          accept={
+            mode === "compress" ? ".txt" :
+            mode === "decompress" ? ".huff" :
+            mode === "compress-image" ? ".png,.jpg,.jpeg,image/png,image/jpeg" :
+            ".huffimg"
+          }
           onChange={handleFileChange}
         />
 
@@ -72,9 +77,22 @@ const FileDropZone = ({ onFileSelect, disabled, mode }) => {
 
             {!disabled && (
               <div className="file-types">
-                <span className="file-type-badge">
-                  {mode === "compress" ? ".txt" : ".huff"}
-                </span>
+                {mode === "compress" && (
+                  <span className="file-type-badge">.txt</span>
+                )}
+                {mode === "decompress" && (
+                  <span className="file-type-badge">.huff</span>
+                )}
+                {mode === "compress-image" && (
+                  <>
+                    <span className="file-type-badge">.png</span>
+                    <span className="file-type-badge">.jpg</span>
+                    <span className="file-type-badge">.jpeg</span>
+                  </>
+                )}
+                {mode === "decompress-image" && (
+                  <span className="file-type-badge">.huffimg</span>
+                )}
               </div>
             )}
           </div>

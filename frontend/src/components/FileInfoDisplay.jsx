@@ -1,9 +1,9 @@
 import React from 'react';
 import { formatBytes } from '../lib/utils';
 
-const FileInfoDisplay = ({ fileName, fileSize, compressedSize, newFileName }) => {
+const FileInfoDisplay = ({ fileName, fileSize, compressedSize, newFileName, isImage, imageUrl, width, height }) => {
   const compressionRatio = compressedSize ? ((1 - compressedSize / fileSize) * 100).toFixed(2) : 0;
-  
+
   return (
     <div className="file-info-display">
       <div className="file-info-header">
@@ -30,7 +30,18 @@ const FileInfoDisplay = ({ fileName, fileSize, compressedSize, newFileName }) =>
         </svg>
         <h3 className="info-title">File Details</h3>
       </div>
-      
+
+      {isImage && imageUrl && (
+        <div className="image-preview">
+          <img src={imageUrl} alt="Decompressed preview" style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain', borderRadius: '8px' }} />
+          {width && height && (
+            <p className="image-dimensions" style={{ textAlign: 'center', marginTop: '8px', fontSize: '14px', color: 'var(--text-secondary)' }}>
+              Dimensions: {width} × {height}
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="info-grid">
         <div className="info-card">
           <div className="info-card-icon">📄</div>
