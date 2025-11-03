@@ -10,13 +10,22 @@ const API_URL = 'http://localhost:5000';
 
 function App() {
   const [file, setFile] = useState(null);
-  const [mode, setMode] = useState('compress'); // 'compress', 'decompress', 'compress-image', 'decompress-image'
+  const [fileType, setFileType] = useState('text'); // 'text' or 'image'
+  const [mode, setMode] = useState('compress'); // 'compress' or 'decompress'
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [status, setStatus] = useState('idle');
   const [progress, setProgress] = useState(0);
   const [history, setHistory] = useState([]);
+
+  // Derive actual mode from fileType + mode
+  const getActualMode = () => {
+    if (fileType === 'image') {
+      return mode === 'compress' ? 'compress-image' : 'decompress-image';
+    }
+    return mode;
+  };
 
   // Load compression history on component mount
   useEffect(() => {
@@ -29,7 +38,10 @@ function App() {
   const handleFileChange = useCallback((selectedFile) => {
     if (selectedFile) {
       try {
-        validateFile(selectedFile, mode);
+        const actualMode = fileType === 'image'
+          ? (mode === 'compress' ? 'compress-image' : 'decompress-image')
+          : mode;
+        validateFile(selectedFile, actualMode);
         setFile(selectedFile);
         setError(null);
         setResult(null);
@@ -40,7 +52,7 @@ function App() {
         setStatus('idle');
       }
     }
-  }, [mode]);
+  }, [fileType, mode]);
 
     const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,15 +70,16 @@ function App() {
 
     try {
       let result;
+      const actualMode = getActualMode();
 
       // Handle image compression/decompression
-      if (mode === 'compress-image' || mode === 'decompress-image') {
+      if (actualMode === 'compress-image' || actualMode === 'decompress-image') {
         const HuffmanImageCompressor = (await import('./lib/huffmanImage.js')).default;
         const imageCompressor = new HuffmanImageCompressor();
 
         setProgress(30);
 
-        if (mode === 'compress-image') {
+        if (actualMode === 'compress-image') {
           const compressed = await imageCompressor.compress(file);
 
           result = {
@@ -108,7 +121,7 @@ function App() {
           reader.onload = (e) => resolve(e.target.result);
           reader.onerror = (e) => reject(new Error('Failed to read file'));
 
-          if (mode === 'compress') {
+          if (actualMode === 'compress') {
             reader.readAsText(file);
           } else {
             reader.readAsArrayBuffer(file);
@@ -117,7 +130,7 @@ function App() {
 
         setProgress(50);
 
-        if (mode === 'compress') {
+        if (actualMode === 'compress') {
           // Compress text content
           const compressed = compressor.compress(fileContent);
 
@@ -171,12 +184,12 @@ function App() {
       let blob;
       let downloadUrl;
 
-      if (result.isImage && mode === 'decompress-image') {
+      if (result.isImage && actualMode === 'decompress-image') {
         blob = result.fileContent;
         downloadUrl = result.imageUrl;
       } else {
-        const blobType = mode === 'compress' ? 'application/octet-stream'
-                       : mode === 'compress-image' ? 'application/octet-stream'
+        const blobType = actualMode === 'compress' ? 'application/octet-stream'
+                       : actualMode === 'compress-image' ? 'application/octet-stream'
                        : result.isImage ? 'image/png'
                        : 'text/plain';
         blob = new Blob([result.fileContent], { type: blobType });
@@ -186,26 +199,26 @@ function App() {
       setResult({
         ...result,
         downloadUrl,
-        mode
+        mode: actualMode
       });
 
       setStatus('success');
       setProgress(100);
 
       // Save to history
-      if (mode === 'compress' || mode === 'compress-image') {
+      if (actualMode === 'compress' || actualMode === 'compress-image') {
         saveToHistory({
           fileName: file.name,
           originalSize: result.originalSize,
           compressedSize: result.compressedSize,
           compressionRatio: result.compressionRatio,
           timestamp: new Date().toISOString(),
-          mode: mode
+          mode: actualMode
         });
       }
     } catch (err) {
       console.error('Operation failed:', err);
-      setError(err.message || `${mode} failed`);
+      setError(err.message || `${actualMode} failed`);
       setStatus('error');
     } finally {
       setLoading(false);
@@ -245,6 +258,40 @@ function App() {
         <AppHeader />
         
         <div className="card">
+          {/* File Type Selector */}
+          <div className="file-type-selector" style={{ marginBottom: '20px', textAlign: 'center' }}>
+            <div style={{ marginBottom: '10px', fontSize: '14px', fontWeight: '500', color: 'var(--text-secondary)' }}>
+              Select file type:
+            </div>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button
+                className={`mode-btn ${fileType === 'text' ? 'active' : ''}`}
+                onClick={() => {
+                  setFileType('text');
+                  setFile(null);
+                  setResult(null);
+                  setError(null);
+                  setStatus('idle');
+                }}
+              >
+                📝 Text
+              </button>
+              <button
+                className={`mode-btn ${fileType === 'image' ? 'active' : ''}`}
+                onClick={() => {
+                  setFileType('image');
+                  setFile(null);
+                  setResult(null);
+                  setError(null);
+                  setStatus('idle');
+                }}
+              >
+                🖼️ Image
+              </button>
+            </div>
+          </div>
+
+          {/* Mode Selector */}
           <div className="mode-selector">
             <button
               className={`mode-btn ${mode === 'compress' ? 'active' : ''}`}
@@ -256,7 +303,7 @@ function App() {
                 setStatus('idle');
               }}
             >
-              Text Compress
+              Compress
             </button>
             <button
               className={`mode-btn ${mode === 'decompress' ? 'active' : ''}`}
@@ -268,38 +315,14 @@ function App() {
                 setStatus('idle');
               }}
             >
-              Text Decompress
-            </button>
-            <button
-              className={`mode-btn ${mode === 'compress-image' ? 'active' : ''}`}
-              onClick={() => {
-                setMode('compress-image');
-                setFile(null);
-                setResult(null);
-                setError(null);
-                setStatus('idle');
-              }}
-            >
-              Image Compress
-            </button>
-            <button
-              className={`mode-btn ${mode === 'decompress-image' ? 'active' : ''}`}
-              onClick={() => {
-                setMode('decompress-image');
-                setFile(null);
-                setResult(null);
-                setError(null);
-                setStatus('idle');
-              }}
-            >
-              Image Decompress
+              Decompress
             </button>
           </div>
 
-         <FileDropZone 
-            onFileSelect={handleFileChange} 
+         <FileDropZone
+            onFileSelect={handleFileChange}
             disabled={loading}
-            mode={mode}   // ✅ add this line
+            mode={getActualMode()}
           />
 
 
@@ -320,10 +343,8 @@ function App() {
                 disabled={loading || status === 'error'}
               >
                 {loading ? 'Processing...' :
-                 mode === 'compress' ? 'Compress Text' :
-                 mode === 'decompress' ? 'Decompress Text' :
-                 mode === 'compress-image' ? 'Compress Image' :
-                 'Decompress Image'}
+                 mode === 'compress' ? `Compress ${fileType === 'image' ? 'Image' : 'Text'}` :
+                 `Decompress ${fileType === 'image' ? 'Image' : 'Text'}`}
               </button>
             </div>
           )}
@@ -350,10 +371,10 @@ function App() {
         <div className="info-box card">
           <h3>About Huffman Coding</h3>
           <p>
-            Huffman coding is a lossless data compression algorithm that assigns variable-length codes to input characters, with shorter codes for more frequent characters.
+            Huffman coding is a data compression algorithm that assigns variable-length codes to input data, with shorter codes for more frequent elements.
           </p>
           <p>
-            This application allows you to compress text files using Huffman coding and decompress previously compressed files.
+            This application allows you to compress both <strong>text files</strong> (lossless) and <strong>images</strong> (lossy with color quantization) using Huffman coding.
           </p>
         </div>
 
