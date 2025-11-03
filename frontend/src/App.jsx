@@ -266,7 +266,7 @@ function App() {
           )}
         </div>
 
-        <div className="info-box">
+        <div className="info-box card">
           <h3>About Huffman Coding</h3>
           <p>
             Huffman coding is a lossless data compression algorithm that assigns variable-length codes to input characters, with shorter codes for more frequent characters.
