@@ -41,10 +41,13 @@ const FileDropZone = ({ onFileSelect, disabled, mode }) => {
           className="file-input"
           disabled={disabled}
           accept={
-            mode === "compress" ? ".txt" :
-            mode === "decompress" ? ".huff" :
-            mode === "compress-image" ? ".png,.jpg,.jpeg,image/png,image/jpeg" :
-            ".huffimg"
+            mode === "compress"
+              ? ".txt"
+              : mode === "decompress"
+              ? ".huff"
+              : mode === "compress-image"
+              ? ".png,.jpg,.jpeg,image/png,image/jpeg"
+              : ".huffimg"
           }
           onChange={handleFileChange}
         />
