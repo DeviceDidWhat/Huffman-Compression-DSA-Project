@@ -285,12 +285,12 @@ body::before {
 }
 
 .card:hover {
-  border-color: rgba(99, 102, 241, 0.3);
+  border-color: rgba(127, 129, 246, 0.3);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), var(--shadow-glow);
 }
 
 /* ============================================
-   MODE SELECTOR
+   MODE SELECTOR  
    ============================================ */
 .mode-selector {
   display: grid;
@@ -835,7 +835,7 @@ body::before {
    ============================================ */
 .file-info-display {
   margin-top: var(--spacing-lg);
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(255, 255, 255, 0.5);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   padding: var(--spacing-lg);
@@ -876,7 +876,7 @@ body::before {
 }
 
 .info-card {
-  background: rgba(30, 41, 59, 0.5);
+  background: rgba(252, 252, 252, 0.5);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-md);
@@ -898,7 +898,7 @@ body::before {
 }
 
 .info-card:hover {
-  border-color: rgba(99, 102, 241, 0.5);
+  border-color: rgba(71, 71, 94, 0.5);
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
 }
@@ -910,7 +910,7 @@ body::before {
 .info-card-icon {
   font-size: 2rem;
   flex-shrink: 0;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.2));
   position: relative;
   z-index: 1;
 }
@@ -1003,7 +1003,7 @@ body::before {
 .compression-visual {
   margin-top: var(--spacing-md);
   padding: var(--spacing-md);
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(214, 215, 216, 0.5);
   border-radius: var(--radius-md);
 }
 
@@ -1172,9 +1172,9 @@ body::before {
 }
 
 .history-item:hover {
-  border-color: rgba(99, 102, 241, 0.5);
+  border-color: rgba(92, 92, 243, 0.5);
   transform: translateX(5px);
-  background: rgba(30, 41, 59, 0.8);
+  background: rgba(50, 59, 74, 0.8);
 }
 
 .history-item-info {
