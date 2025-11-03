@@ -1,4 +1,5 @@
 import React from 'react';
+import ThemeToggleButton from './ThemeToggleButton';
 
 const AppHeader = () => {
   return (
@@ -47,8 +48,11 @@ const AppHeader = () => {
             </p>
           </div>
         </div>
-        <div className="header-badge">
-          <span className="badge-text">DSA Project</span>
+        <div className="header-actions">
+          <div className="header-badge">
+            <span className="badge-text">DSA Project</span>
+          </div>
+          <ThemeToggleButton />
         </div>
       </div>
       <div className="header-divider"></div>
