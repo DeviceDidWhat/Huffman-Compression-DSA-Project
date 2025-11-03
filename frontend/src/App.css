@@ -333,7 +333,7 @@ body::before {
 }
 
 .mode-btn.active {
-  color: white;
+  color: var(--text-primary);
   box-shadow: var(--shadow-md);
 }
 
@@ -1365,8 +1365,8 @@ body::before {
 }
 
 /* ============================================
-   LIGHT THEME VARIABLES
-   ============================================ */
+LIGHT THEME VARIABLES
+============================================ */
 [data-theme="light"] {
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
@@ -1392,8 +1392,12 @@ body::before {
 }
 
 [data-theme="light"] .header-badge {
-  background: rgba(99, 102, 241, 0.08);
+  background: rgba(255, 255, 255, 0.08);
   border-color: rgba(99, 102, 241, 0.25);
+}
+
+[data-theme="light"] .theme-toggle {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 [data-theme="light"] .mode-selector {
@@ -1404,6 +1408,17 @@ body::before {
   background: rgba(241, 245, 249, 0.5);
   border-color: var(--border);
 }
+
+[data-theme="light"] .history-item{
+  background: rgba(255, 255, 255, 0.5);
+
+}
+
+[data-theme="light"] .history-item:hover{
+  background: rgba(216, 216, 216, 0.5);
+
+}
+
 
 [data-theme="light"] .download-btn,
 [data-theme="light"] .submit-btn {
