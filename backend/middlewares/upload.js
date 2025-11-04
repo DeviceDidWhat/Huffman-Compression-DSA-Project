@@ -17,15 +17,24 @@ const storage = multer.diskStorage({ // Configure storage
   }
 });
 
-const fileFilter = (req, file, cb) => { // File filter for text files
-  const allowedMimes = ['text/plain', 'application/octet-stream'];
-  
-  if (allowedMimes.includes(file.mimetype) || 
-      file.originalname.endsWith('.txt') || 
-      file.originalname.endsWith('.huff')) {
+const fileFilter = (req, file, cb) => { // File filter for text and image files
+  const allowedMimes = [
+    'text/plain',
+    'application/octet-stream',
+    'image/png',
+    'image/jpeg',
+    'image/jpg'
+  ];
+
+  const allowedExtensions = ['.txt', '.huff', '.png', '.jpg', '.jpeg', '.huffimg'];
+  const hasAllowedExtension = allowedExtensions.some(ext =>
+    file.originalname.toLowerCase().endsWith(ext)
+  );
+
+  if (allowedMimes.includes(file.mimetype) || hasAllowedExtension) {
     cb(null, true);
   } else {
-    cb(new Error('Only .txt and .huff files are allowed'), false);
+    cb(new Error('Only .txt, .huff, .png, .jpg, .jpeg, and .huffimg files are allowed'), false);
   }
 };
 

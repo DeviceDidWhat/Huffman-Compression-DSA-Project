@@ -5,14 +5,28 @@ const HuffmanCoding = require('../utils/huffman');
 exports.compressFile = async (req, res) => { // Compress file
   try {
     if (!req.file) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'No file uploaded' 
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded'
       });
     }
 
     const filePath = req.file.path;
-    const fileContent = fs.readFileSync(filePath, 'utf8');
+
+    // Read file content, attempting to handle various encodings
+    let fileContent;
+    try {
+      fileContent = fs.readFileSync(filePath, 'utf8');
+
+      // Validate that the content is valid UTF-8
+      // If it contains replacement characters, it might be binary or different encoding
+      if (fileContent.includes('\uFFFD')) {
+        throw new Error('File contains invalid UTF-8 characters');
+      }
+    } catch (encodingError) {
+      // If UTF-8 fails, try reading as latin1 which accepts all byte values
+      fileContent = fs.readFileSync(filePath, 'latin1');
+    }
 
     const huffman = new HuffmanCoding();     // Compressing using Huffman coding
     const compressed = huffman.compress(fileContent);
@@ -91,10 +105,17 @@ exports.decompressFile = async (req, res) => { // This is for decompression of f
     const huffman = new HuffmanCoding(); // decompress using huffman coding
     const binaryString = huffman.bufferToBinaryString(compressedBuffer, metadata.padding);
     const decompressedText = huffman.decompress(binaryString, metadata.codes);
- 
+
     const decompressedFileName = `decompressed_${metadata.originalName}`; // will save decompressed file
     const decompressedFilePath = path.join(req.file.destination, decompressedFileName);
-    fs.writeFileSync(decompressedFilePath, decompressedText, 'utf8');
+
+    // Try to write as UTF-8, fall back to latin1 if needed
+    try {
+      fs.writeFileSync(decompressedFilePath, decompressedText, 'utf8');
+    } catch (writeError) {
+      // If UTF-8 write fails, use latin1 to preserve all bytes
+      fs.writeFileSync(decompressedFilePath, decompressedText, 'latin1');
+    }
   
     fs.unlinkSync(filePath); // delete uploaded compressed file
 

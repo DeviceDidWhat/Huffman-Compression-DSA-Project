@@ -7,6 +7,62 @@ class HuffmanNode {
   }
 }
 
+// Min-heap implementation for efficient Huffman tree building
+class MinHeap {
+  constructor() {
+    this.heap = [];
+  }
+
+  insert(node) {
+    this.heap.push(node);
+    this.bubbleUp(this.heap.length - 1);
+  }
+
+  extractMin() {
+    if (this.heap.length === 0) return null;
+    if (this.heap.length === 1) return this.heap.pop();
+
+    const min = this.heap[0];
+    this.heap[0] = this.heap.pop();
+    this.bubbleDown(0);
+    return min;
+  }
+
+  bubbleUp(index) {
+    while (index > 0) {
+      const parentIndex = Math.floor((index - 1) / 2);
+      if (this.heap[index].freq >= this.heap[parentIndex].freq) break;
+
+      [this.heap[index], this.heap[parentIndex]] = [this.heap[parentIndex], this.heap[index]];
+      index = parentIndex;
+    }
+  }
+
+  bubbleDown(index) {
+    while (true) {
+      const leftChild = 2 * index + 1;
+      const rightChild = 2 * index + 2;
+      let smallest = index;
+
+      if (leftChild < this.heap.length && this.heap[leftChild].freq < this.heap[smallest].freq) {
+        smallest = leftChild;
+      }
+      if (rightChild < this.heap.length && this.heap[rightChild].freq < this.heap[smallest].freq) {
+        smallest = rightChild;
+      }
+
+      if (smallest === index) break;
+
+      [this.heap[index], this.heap[smallest]] = [this.heap[smallest], this.heap[index]];
+      index = smallest;
+    }
+  }
+
+  size() {
+    return this.heap.length;
+  }
+}
+
 export class HuffmanCompressor {
   constructor() {
     this.codes = {};
@@ -22,28 +78,28 @@ export class HuffmanCompressor {
     return frequency;
   }
 
-  // Build Huffman tree
+  // Build Huffman tree with min-heap for O(n log n) complexity
   buildHuffmanTree(frequency) {
-    const heap = Object.entries(frequency).map(([char, freq]) => 
-      new HuffmanNode(char, freq)
-    );
+    const heap = new MinHeap();
 
-    // Sort by frequency (min heap)
-    heap.sort((a, b) => a.freq - b.freq);
+    // Insert all characters into the min-heap
+    for (const [char, freq] of Object.entries(frequency)) {
+      heap.insert(new HuffmanNode(char, freq));
+    }
 
-    while (heap.length > 1) {
-      const left = heap.shift();
-      const right = heap.shift();
+    // Build the tree by merging nodes
+    while (heap.size() > 1) {
+      const left = heap.extractMin();
+      const right = heap.extractMin();
 
       const merged = new HuffmanNode(null, left.freq + right.freq);
       merged.left = left;
       merged.right = right;
 
-      heap.push(merged);
-      heap.sort((a, b) => a.freq - b.freq);
+      heap.insert(merged);
     }
 
-    return heap[0];
+    return heap.extractMin();
   }
 
   // Generate codes from tree
@@ -182,14 +238,14 @@ export class HuffmanCompressor {
   binaryStringToUint8Array(binaryString) {
     const padding = (8 - (binaryString.length % 8)) % 8;
     const paddedBinaryString = binaryString + '0'.repeat(padding);
-    
+
     const bytes = new Uint8Array(Math.ceil(paddedBinaryString.length / 8));
-    
+
     for (let i = 0; i < paddedBinaryString.length; i += 8) {
-      const byte = paddedBinaryString.substr(i, 8);
+      const byte = paddedBinaryString.substring(i, i + 8);
       bytes[i / 8] = parseInt(byte, 2);
     }
-    
+
     return { bytes, padding };
   }
 

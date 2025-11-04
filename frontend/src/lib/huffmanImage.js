@@ -10,6 +10,62 @@ class HuffmanNode {
   }
 }
 
+// Min-heap implementation for efficient Huffman tree building
+class ImageMinHeap {
+  constructor() {
+    this.heap = [];
+  }
+
+  insert(node) {
+    this.heap.push(node);
+    this.bubbleUp(this.heap.length - 1);
+  }
+
+  extractMin() {
+    if (this.heap.length === 0) return null;
+    if (this.heap.length === 1) return this.heap.pop();
+
+    const min = this.heap[0];
+    this.heap[0] = this.heap.pop();
+    this.bubbleDown(0);
+    return min;
+  }
+
+  bubbleUp(index) {
+    while (index > 0) {
+      const parentIndex = Math.floor((index - 1) / 2);
+      if (this.heap[index].frequency >= this.heap[parentIndex].frequency) break;
+
+      [this.heap[index], this.heap[parentIndex]] = [this.heap[parentIndex], this.heap[index]];
+      index = parentIndex;
+    }
+  }
+
+  bubbleDown(index) {
+    while (true) {
+      const leftChild = 2 * index + 1;
+      const rightChild = 2 * index + 2;
+      let smallest = index;
+
+      if (leftChild < this.heap.length && this.heap[leftChild].frequency < this.heap[smallest].frequency) {
+        smallest = leftChild;
+      }
+      if (rightChild < this.heap.length && this.heap[rightChild].frequency < this.heap[smallest].frequency) {
+        smallest = rightChild;
+      }
+
+      if (smallest === index) break;
+
+      [this.heap[index], this.heap[smallest]] = [this.heap[smallest], this.heap[index]];
+      index = smallest;
+    }
+  }
+
+  size() {
+    return this.heap.length;
+  }
+}
+
 class HuffmanImageCompressor {
   constructor() {
     this.codes = {};
@@ -45,8 +101,11 @@ class HuffmanImageCompressor {
   }
 
   // Color quantization - reduce color depth to 64 levels per channel (6-bit)
+  // WARNING: This is LOSSY compression!
+  // Reduces from 256 levels (8-bit) to 64 levels (6-bit) per channel
+  // Color space: 16,777,216 colors (24-bit) -> 262,144 colors (18-bit)
+  // This results in visible quality loss but significantly better compression
   quantizeColor(value) {
-    // Reduce from 256 levels (8-bit) to 64 levels (6-bit)
     const levels = 64;
     const step = 256 / levels;
     return Math.floor(value / step) * step;
@@ -98,7 +157,7 @@ class HuffmanImageCompressor {
     return freqMap;
   }
 
-  // Build Huffman tree from frequency map
+  // Build Huffman tree from frequency map with proper min-heap
   buildHuffmanTree(freqMap) {
     if (freqMap.size === 0) return null;
     if (freqMap.size === 1) {
@@ -106,35 +165,28 @@ class HuffmanImageCompressor {
       return new HuffmanNode(value, freq);
     }
 
-    // Create priority queue (min-heap)
-    const heap = Array.from(freqMap.entries()).map(
-      ([value, freq]) => new HuffmanNode(value, freq)
-    );
-    heap.sort((a, b) => a.frequency - b.frequency);
+    // Use a proper min-heap for O(n log n) complexity
+    const heap = new ImageMinHeap();
 
-    while (heap.length > 1) {
-      const left = heap.shift();
-      const right = heap.shift();
+    // Insert all values into the heap
+    for (const [value, freq] of freqMap.entries()) {
+      heap.insert(new HuffmanNode(value, freq));
+    }
+
+    // Build the tree by merging nodes
+    while (heap.size() > 1) {
+      const left = heap.extractMin();
+      const right = heap.extractMin();
       const parent = new HuffmanNode(
         null,
         left.frequency + right.frequency,
         left,
         right
       );
-
-      // Insert maintaining sorted order
-      let inserted = false;
-      for (let i = 0; i < heap.length; i++) {
-        if (parent.frequency < heap[i].frequency) {
-          heap.splice(i, 0, parent);
-          inserted = true;
-          break;
-        }
-      }
-      if (!inserted) heap.push(parent);
+      heap.insert(parent);
     }
 
-    return heap[0];
+    return heap.extractMin();
   }
 
   // Generate Huffman codes from tree
@@ -209,7 +261,7 @@ class HuffmanImageCompressor {
 
     const bytes = new Uint8Array(bitString.length / 8);
     for (let i = 0; i < bytes.length; i++) {
-      bytes[i] = parseInt(bitString.substr(i * 8, 8), 2);
+      bytes[i] = parseInt(bitString.substring(i * 8, i * 8 + 8), 2);
     }
     return { bytes, padding };
   }
@@ -307,6 +359,11 @@ class HuffmanImageCompressor {
       gLength: deltaG.length,
       bLength: deltaB.length,
       aLength: deltaA.length,
+      // Add actual compressed byte lengths for proper decompression
+      rByteLength: rChannel.bytes.length,
+      gByteLength: gChannel.bytes.length,
+      bByteLength: bChannel.bytes.length,
+      aByteLength: aChannel.bytes.length,
     };
 
     const metadataJson = JSON.stringify(metadata);
@@ -381,44 +438,34 @@ class HuffmanImageCompressor {
             throw new Error("Invalid .huffimg file format");
           }
 
-          // Extract compressed channel data
+          // Verify version
+          if (metadata.version !== 1) {
+            throw new Error(`Unsupported file version: ${metadata.version}`);
+          }
+
+          // Validate metadata has required byte length fields
+          if (!metadata.rByteLength || !metadata.gByteLength ||
+              !metadata.bByteLength || !metadata.aByteLength) {
+            throw new Error("Invalid file format: missing byte length information. This file may have been created with an older version.");
+          }
+
+          // Extract compressed channel data using actual byte lengths from metadata
           let offset = 4 + metadataLength;
+          const remainingData = data.slice(offset);
 
-          const rBytes = data.slice(
-            offset,
-            offset + Math.ceil((metadata.rLength * 9) / 8)
-          ); // Rough estimate
-          offset += rBytes.length;
+          // Use actual byte lengths from metadata instead of estimates
+          const rByteLength = metadata.rByteLength;
+          const gByteLength = metadata.gByteLength;
+          const bByteLength = metadata.bByteLength;
+          const aByteLength = metadata.aByteLength;
 
-          // For simplicity, read remaining bytes and split
-          const remainingData = data.slice(4 + metadataLength);
+          // Validate we have enough data
+          const expectedTotalBytes = rByteLength + gByteLength + bByteLength + aByteLength;
+          if (remainingData.length < expectedTotalBytes) {
+            throw new Error(`Corrupted file: expected ${expectedTotalBytes} bytes, got ${remainingData.length}`);
+          }
 
-          // Decode each channel
-          const decodeChannel = (
-            channelData,
-            treeSerialized,
-            padding,
-            length
-          ) => {
-            const tree = this.deserializeTree(treeSerialized);
-            const bitString = this.bytesToBitString(channelData, padding);
-            const decoded = this.decodeData(bitString, tree, length);
-            return decoded;
-          };
-
-          // Reconstruct trees and decode
-          const rTree = this.deserializeTree(metadata.rTree);
-          const gTree = this.deserializeTree(metadata.gTree);
-          const bTree = this.deserializeTree(metadata.bTree);
-          const aTree = this.deserializeTree(metadata.aTree);
-
-          // Calculate byte offsets for each channel
-          const rByteLength = Math.ceil((metadata.rLength * 9) / 8); // Estimate
-          const gByteLength = Math.ceil((metadata.gLength * 9) / 8);
-          const bByteLength = Math.ceil((metadata.bLength * 9) / 8);
-          const aByteLength = Math.ceil((metadata.aLength * 9) / 8);
-
-          offset = 4 + metadataLength;
+          // Extract each channel's bytes
           const rBytesActual = remainingData.slice(0, rByteLength);
           const gBytesActual = remainingData.slice(
             rByteLength,
@@ -429,9 +476,17 @@ class HuffmanImageCompressor {
             rByteLength + gByteLength + bByteLength
           );
           const aBytesActual = remainingData.slice(
-            rByteLength + gByteLength + bByteLength
+            rByteLength + gByteLength + bByteLength,
+            rByteLength + gByteLength + bByteLength + aByteLength
           );
 
+          // Reconstruct trees
+          const rTree = this.deserializeTree(metadata.rTree);
+          const gTree = this.deserializeTree(metadata.gTree);
+          const bTree = this.deserializeTree(metadata.bTree);
+          const aTree = this.deserializeTree(metadata.aTree);
+
+          // Convert bytes to bit strings
           const rBitString = this.bytesToBitString(
             rBytesActual,
             metadata.rPadding
@@ -449,6 +504,7 @@ class HuffmanImageCompressor {
             metadata.aPadding
           );
 
+          // Decode each channel
           const deltaR = this.decodeData(rBitString, rTree, metadata.rLength);
           const deltaG = this.decodeData(gBitString, gTree, metadata.gLength);
           const deltaB = this.decodeData(bBitString, bTree, metadata.bLength);
@@ -460,15 +516,28 @@ class HuffmanImageCompressor {
           const channelB = this.deltaReverse(deltaB);
           const channelA = this.deltaReverse(deltaA);
 
-          // Reconstruct image data
+          // Validate channel lengths match expected pixel count
+          const expectedPixelCount = metadata.width * metadata.height;
+          if (channelR.length !== expectedPixelCount ||
+              channelG.length !== expectedPixelCount ||
+              channelB.length !== expectedPixelCount ||
+              channelA.length !== expectedPixelCount) {
+            throw new Error(
+              `Channel length mismatch: expected ${expectedPixelCount} pixels, ` +
+              `got R:${channelR.length}, G:${channelG.length}, B:${channelB.length}, A:${channelA.length}`
+            );
+          }
+
+          // Reconstruct image data with value clamping
           const imageData = new Uint8ClampedArray(
             metadata.width * metadata.height * 4
           );
           for (let i = 0; i < channelR.length; i++) {
-            imageData[i * 4] = channelR[i];
-            imageData[i * 4 + 1] = channelG[i];
-            imageData[i * 4 + 2] = channelB[i];
-            imageData[i * 4 + 3] = channelA[i];
+            // Clamp values to valid byte range (0-255)
+            imageData[i * 4] = Math.max(0, Math.min(255, channelR[i]));
+            imageData[i * 4 + 1] = Math.max(0, Math.min(255, channelG[i]));
+            imageData[i * 4 + 2] = Math.max(0, Math.min(255, channelB[i]));
+            imageData[i * 4 + 3] = Math.max(0, Math.min(255, channelA[i]));
           }
 
           // Create canvas and render image
