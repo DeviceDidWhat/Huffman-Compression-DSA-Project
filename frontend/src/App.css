@@ -573,10 +573,101 @@ body::before {
   inset: 0;
   background: radial-gradient(
     circle at center,
-    rgba(99, 102, 241, 0.2),
-    transparent
+    rgba(99, 102, 241, 0.95),
+    rgba(139, 92, 246, 0.9)
   );
-  animation: overlayPulse 1s ease-in-out infinite;
+  backdrop-filter: blur(10px);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: overlayFadeIn 0.2s ease;
+  pointer-events: none;
+  border-radius: var(--radius-xl);
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-align: center;
+  animation: overlayBounce 0.5s ease;
+}
+
+@keyframes overlayBounce {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(5px);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.overlay-icon {
+  width: 80px;
+  height: 80px;
+  color: white;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+  animation: overlayIconFloat 2s ease-in-out infinite;
+}
+
+@keyframes overlayIconFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.overlay-text {
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.02em;
+}
+
+.overlay-badge {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  animation: overlayBadgePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes overlayBadgePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+  }
 }
 
 @keyframes overlayPulse {
@@ -1496,6 +1587,20 @@ body::before {
 
   .container {
     padding: 1rem 0.5rem;
+  }
+
+  .overlay-text {
+    font-size: 1.5rem;
+  }
+
+  .overlay-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .overlay-badge {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
   }
 
   .header-content {

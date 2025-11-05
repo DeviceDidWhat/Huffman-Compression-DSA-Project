@@ -1,21 +1,39 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 const FileDropZone = ({ onFileSelect, disabled, mode }) => {
   const [isDragOver, setIsDragOver] = useState(false);
+  const [dragCounter, setDragCounter] = useState(0);
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    if (!disabled) {
+      setDragCounter(prev => prev + 1);
+      setIsDragOver(true);
+    }
+  };
 
   const handleDragOver = (e) => {
     e.preventDefault();
-    if (!disabled) setIsDragOver(true);
+    e.stopPropagation();
   };
 
   const handleDragLeave = (e) => {
     e.preventDefault();
-    setIsDragOver(false);
+    if (!disabled) {
+      setDragCounter(prev => {
+        const newCounter = prev - 1;
+        if (newCounter === 0) {
+          setIsDragOver(false);
+        }
+        return newCounter;
+      });
+    }
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragOver(false);
+    setDragCounter(0);
     if (!disabled && e.dataTransfer.files.length > 0) {
       onFileSelect(e.dataTransfer.files[0]);
     }
@@ -31,10 +49,38 @@ const FileDropZone = ({ onFileSelect, disabled, mode }) => {
         className={`dropzone ${isDragOver ? "drag-over" : ""} ${
           disabled ? "disabled" : ""
         }`}
+        onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
+        {isDragOver && (
+          <div className="dropzone-overlay">
+            <div className="overlay-content">
+              <svg
+                className="overlay-icon"
+                width="80"
+                height="80"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                fill="none"
+                strokeWidth="2"
+              >
+                <path d="M21 15V19C21 19.5 20.8 20 20.4 20.4C20 20.8 19.5 21 19 21H5C4.5 21 4 20.8 3.6 20.4C3.2 20 3 19.5 3 19V15" />
+                <path d="M17 8L12 3L7 8" />
+                <path d="M12 3V15" />
+              </svg>
+              <h2 className="overlay-text">Drop your file here!</h2>
+              <div className="overlay-badge">
+                {mode === "compress" && "Text File (.txt)"}
+                {mode === "decompress" && "Compressed File (.huff)"}
+                {mode === "compress-image" && "Image File (.png, .jpg, .jpeg)"}
+                {mode === "decompress-image" && "Compressed Image (.huffimg)"}
+              </div>
+            </div>
+          </div>
+        )}
+
         <input
           type="file"
           id="file-input"
@@ -54,31 +100,33 @@ const FileDropZone = ({ onFileSelect, disabled, mode }) => {
 
         <label htmlFor="file-input" className="file-label">
           <div className="dropzone-content">
-            <svg
-              className="upload-icon"
-              width="50"
-              height="50"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              fill="none"
-              strokeWidth="2"
-            >
-              <path d="M21 15V19C21 19.5 20.8 20 20.4 20.4C20 20.8 19.5 21 19 21H5C4.5 21 4 20.8 3.6 20.4C3.2 20 3 19.5 3 19V15" />
-              <path d="M17 8L12 3L7 8" />
-              <path d="M12 3V15" />
-            </svg>
+            <div className="icon-wrapper">
+              <svg
+                className="upload-icon"
+                width="50"
+                height="50"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                fill="none"
+                strokeWidth="2"
+              >
+                <path d="M21 15V19C21 19.5 20.8 20 20.4 20.4C20 20.8 19.5 21 19 21H5C4.5 21 4 20.8 3.6 20.4C3.2 20 3 19.5 3 19V15" />
+                <path d="M17 8L12 3L7 8" />
+                <path d="M12 3V15" />
+              </svg>
+              {/* {!isDragOver && <div className="pulse-ring"></div>} */}
+            </div>
 
-            <h3 className="dropzone-title">
-              {isDragOver ? "Drop it here!" : "Drag and drop your file"}
-            </h3>
-
-            {!isDragOver && (
+            <div className="dropzone-text">
+              <h3 className="dropzone-title">
+                Drag and drop your file
+              </h3>
               <p className="dropzone-subtitle">
                 or click to <span className="browse-text">browse</span>
               </p>
-            )}
+            </div>
 
-            {!disabled && (
+            {!disabled && !isDragOver && (
               <div className="file-types">
                 {mode === "compress" && (
                   <span className="file-type-badge">.txt</span>
