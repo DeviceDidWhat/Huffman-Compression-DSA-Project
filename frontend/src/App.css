@@ -1056,7 +1056,8 @@ body::before {
    ============================================ */
 .file-info-display {
   margin-top: var(--spacing-lg);
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(20px);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   padding: var(--spacing-lg);
@@ -1101,7 +1102,7 @@ body::before {
 }
 
 .info-card {
-  background: rgba(252, 252, 252, 0.5);
+  background: rgba(15, 23, 42, 0.5);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-md);
@@ -1229,7 +1230,7 @@ body::before {
 .compression-visual {
   margin-top: var(--spacing-md);
   padding: var(--spacing-md);
-  background: rgba(214, 215, 216, 0.5);
+  background: rgba(15, 23, 42, 0.3);
   border-radius: var(--radius-md);
 }
 
@@ -1896,6 +1897,37 @@ LIGHT THEME VARIABLES
 [data-theme="light"] .download-btn,
 [data-theme="light"] .submit-btn {
   color: #ffffff;
+}
+
+[data-theme="light"] .file-info-display {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="light"] .info-card {
+  background: rgba(252, 252, 252, 0.5);
+}
+
+[data-theme="light"] .compression-visual {
+  background: rgba(241, 245, 249, 0.7);
+}
+
+[data-theme="light"] .code-table-container,
+[data-theme="light"] .tree-visualizer-container {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="light"] .table-wrapper,
+[data-theme="light"] .tree-canvas {
+  background: rgba(248, 250, 252, 0.5);
+}
+
+[data-theme="light"] .search-box,
+[data-theme="light"] .sort-buttons {
+  background: rgba(248, 250, 252, 0.7);
+}
+
+[data-theme="light"] .info-row {
+  background: rgba(248, 250, 252, 0.5);
 }
 
 /* ============================================
