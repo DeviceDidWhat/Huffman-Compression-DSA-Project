@@ -4,6 +4,7 @@ import AppHeader from './components/AppHeader'
 import FileDropZone from './components/FileDropZone'
 import FileInfoDisplay from './components/FileInfoDisplay'
 import StatusCard from './components/StatusCard'
+import CodeTable from './components/CodeTable'
 import { validateFile, formatBytes, saveToHistory, getCompressionHistory } from './lib/utils'
 
 const API_URL = 'http://localhost:5000';
@@ -18,6 +19,9 @@ function App() {
   const [status, setStatus] = useState('idle');
   const [progress, setProgress] = useState(0);
   const [history, setHistory] = useState([]);
+  const [huffmanTree, setHuffmanTree] = useState(null);
+  const [huffmanCodes, setHuffmanCodes] = useState(null);
+  const [showVisualization, setShowVisualization] = useState(false);
 
   // Derive actual mode from fileType + mode
   const getActualMode = () => {
@@ -133,6 +137,13 @@ function App() {
         if (actualMode === 'compress') {
           // Compress text content
           const compressed = compressor.compress(fileContent);
+
+          // Store Huffman tree and codes for visualization
+          const frequency = compressor.buildFrequencyMap(fileContent);
+          const tree = compressor.buildHuffmanTree(frequency);
+          compressor.generateCodes(tree);
+          setHuffmanTree(tree);
+          setHuffmanCodes(compressor.codes);
 
           // Create compressed file with metadata
           const compressedFile = compressor.createCompressedFile(
@@ -364,9 +375,32 @@ function App() {
               <button className="download-btn" onClick={handleDownload}>
                 Download File
               </button>
+
+              {/* Visualization Toggle Button - Only show for text compression */}
+              {huffmanTree && huffmanCodes && fileType === 'text' && mode === 'compress' && (
+                <button
+                  className={`visualization-toggle ${showVisualization ? 'open' : ''}`}
+                  onClick={() => setShowVisualization(!showVisualization)}
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="toggle-icon">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                  {showVisualization ? 'Hide Visualization' : 'Show Code Table'}
+                </button>
+              )}
             </div>
           )}
         </div>
+
+        {/* Huffman Tree Code Table */}
+        {huffmanTree && huffmanCodes && fileType === 'text' && mode === 'compress' && showVisualization && (
+          <>
+            <CodeTable
+              codes={huffmanCodes}
+              isVisible={showVisualization}
+            />
+          </>
+        )}
 
         <div className="info-box card">
           <h3>About Huffman Coding</h3>
