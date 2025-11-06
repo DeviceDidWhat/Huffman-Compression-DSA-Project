@@ -463,6 +463,37 @@ body::before {
   pointer-events: none;
 }
 
+.dropzone.file-selected {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.1);
+  border-width: 2px;
+  animation: fileSelectedPulse 0.5s ease;
+}
+
+@keyframes fileSelectedPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+  }
+  50% {
+    transform: scale(1.01);
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+
+.dropzone.file-selected::before {
+  opacity: 0.15;
+}
+
+.dropzone.file-selected:hover {
+  border-color: var(--primary-light);
+  background: rgba(99, 102, 241, 0.15);
+}
+
 .file-input {
   display: none;
 }
@@ -509,6 +540,35 @@ body::before {
   color: var(--primary);
 }
 
+.file-icon {
+  width: 60px;
+  height: 60px;
+  color: var(--primary);
+  transition: all var(--transition-base);
+  filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.4));
+  animation: fileIconAppear 0.4s ease;
+}
+
+@keyframes fileIconAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) rotate(-10deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.dropzone.file-selected:hover .file-icon {
+  transform: translateY(-3px) scale(1.05);
+  color: var(--primary-light);
+  filter: drop-shadow(0 6px 12px rgba(99, 102, 241, 0.5));
+}
+
 .pulse-ring {
   position: absolute;
   inset: -10px;
@@ -538,11 +598,47 @@ body::before {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-primary);
+  transition: all var(--transition-base);
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.dropzone.file-selected .dropzone-title {
+  color: var(--primary-light);
+  animation: titleFadeIn 0.4s ease;
+}
+
+@keyframes titleFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropzone-subtitle {
   font-size: 1rem;
   color: var(--text-muted);
+  transition: all var(--transition-base);
+}
+
+.dropzone.file-selected .dropzone-subtitle {
+  color: var(--text-secondary);
+  animation: subtitleFadeIn 0.5s ease;
+}
+
+@keyframes subtitleFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .browse-text {
@@ -1686,6 +1782,11 @@ body::before {
     font-size: 1.125rem;
   }
 
+  .dropzone.file-selected .dropzone-title {
+    font-size: 1rem;
+    word-break: break-all;
+  }
+
   .dropzone-subtitle {
     font-size: 0.875rem;
   }
@@ -1884,6 +1985,15 @@ LIGHT THEME VARIABLES
 [data-theme="light"] .dropzone {
   background: rgba(241, 245, 249, 0.5);
   border-color: var(--border);
+}
+
+[data-theme="light"] .dropzone.file-selected {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: var(--primary);
+}
+
+[data-theme="light"] .dropzone.file-selected:hover {
+  background: rgba(99, 102, 241, 0.12);
 }
 
 [data-theme="light"] .history-item {
