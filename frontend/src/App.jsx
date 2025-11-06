@@ -334,6 +334,7 @@ function App() {
             onFileSelect={handleFileChange}
             disabled={loading}
             mode={getActualMode()}
+            selectedFile={file}
           />
 
 
