@@ -5,20 +5,19 @@ const THEME_STORAGE_KEY = "ui-theme";
 function getInitialTheme() {
   const persisted = localStorage.getItem(THEME_STORAGE_KEY);
   if (persisted === "light" || persisted === "dark") return persisted;
-  // Fallback to system preference
+  // Fallback to system preference, or dark mode as default
   const prefersDark =
     window.matchMedia &&
     window.matchMedia("(prefers-color-scheme: dark)").matches;
-  return prefersDark ? "dark" : "light";
+  return prefersDark ? "dark" : "dark";
 }
 
 const ThemeToggleButton = () => {
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState(() => getInitialTheme());
 
   useEffect(() => {
-    const initial = getInitialTheme();
-    setTheme(initial);
-    document.documentElement.setAttribute("data-theme", initial);
+    // Ensure theme is set on mount (should already be set by inline script in index.html)
+    document.documentElement.setAttribute("data-theme", theme);
   }, []);
 
   const toggleTheme = useCallback(() => {
