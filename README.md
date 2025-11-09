@@ -159,7 +159,7 @@ Huffman-Compression-DSA-Project/
 │   │   │   └── compression.worker.js   # Web Worker for async processing (not yet integrated)
 │   │   ├── App.jsx                     # Main application container
 │   │   └── main.jsx                    # Entry point
-│   └── package.json
+│   └── package.jsonc
 ├── LICENSE
 └── README.md
 ```

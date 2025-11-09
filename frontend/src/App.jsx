@@ -1,22 +1,27 @@
-import { useState, useEffect, useCallback } from 'react';
-import './App.css';
-import AppHeader from './components/AppHeader';
-import FileDropZone from './components/FileDropZone';
-import FileInfoDisplay from './components/FileInfoDisplay';
-import StatusCard from './components/StatusCard';
-import CodeTable from './components/CodeTable';
-import { validateFile, formatBytes, saveToHistory, getCompressionHistory } from './lib/utils';
+import { useState, useEffect, useCallback } from "react";
+import "./App.css";
+import AppHeader from "./components/AppHeader";
+import FileDropZone from "./components/FileDropZone";
+import FileInfoDisplay from "./components/FileInfoDisplay";
+import StatusCard from "./components/StatusCard";
+import CodeTable from "./components/CodeTable";
+import {
+  validateFile,
+  formatBytes,
+  saveToHistory,
+  getCompressionHistory,
+} from "./lib/utils";
 
-const API_URL = 'http://localhost:5000';
+const API_URL = "http://localhost:5000";
 
 function App() {
   const [file, setFile] = useState(null);
-  const [fileType, setFileType] = useState('text'); // 'text' or 'image'
-  const [mode, setMode] = useState('compress'); // 'compress' or 'decompress'
+  const [fileType, setFileType] = useState("text"); // 'text' or 'image'
+  const [mode, setMode] = useState("compress"); // 'compress' or 'decompress'
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [status, setStatus] = useState('idle');
+  const [status, setStatus] = useState("idle");
   const [progress, setProgress] = useState(0);
   const [history, setHistory] = useState([]);
   const [huffmanTree, setHuffmanTree] = useState(null);
@@ -25,8 +30,8 @@ function App() {
 
   // Determine which mode to use based on file type
   const getActualMode = () => {
-    if (fileType === 'image') {
-      return mode === 'compress' ? 'compress-image' : 'decompress-image';
+    if (fileType === "image") {
+      return mode === "compress" ? "compress-image" : "decompress-image";
     }
     return mode;
   };
@@ -44,20 +49,20 @@ function App() {
       if (selectedFile) {
         try {
           const actualMode =
-            fileType === 'image'
-              ? mode === 'compress'
-                ? 'compress-image'
-                : 'decompress-image'
+            fileType === "image"
+              ? mode === "compress"
+                ? "compress-image"
+                : "decompress-image"
               : mode;
           validateFile(selectedFile, actualMode);
           setFile(selectedFile);
           setError(null);
           setResult(null);
-          setStatus('selected');
+          setStatus("selected");
         } catch (err) {
           setError(err.message);
           setFile(null);
-          setStatus('idle');
+          setStatus("idle");
         }
       }
     },
@@ -68,14 +73,14 @@ function App() {
     e.preventDefault();
 
     if (!file) {
-      setError('Please select a file');
+      setError("Please select a file");
       return;
     }
 
     setLoading(true);
     setError(null);
     setResult(null);
-    setStatus('processing');
+    setStatus("processing");
     setProgress(10);
 
     try {
@@ -83,13 +88,17 @@ function App() {
       const actualMode = getActualMode();
 
       // ========== IMAGE COMPRESSION / DECOMPRESSION ==========
-      if (actualMode === 'compress-image' || actualMode === 'decompress-image') {
-        const HuffmanImageCompressor = (await import('./lib/huffmanImage.js')).default;
+      if (
+        actualMode === "compress-image" ||
+        actualMode === "decompress-image"
+      ) {
+        const HuffmanImageCompressor = (await import("./lib/huffmanImage.js"))
+          .default;
         const imageCompressor = new HuffmanImageCompressor();
 
         setProgress(30);
 
-        if (actualMode === 'compress-image') {
+        if (actualMode === "compress-image") {
           const compressed = await imageCompressor.compress(file);
 
           result = {
@@ -123,7 +132,7 @@ function App() {
 
       // ========== TEXT COMPRESSION / DECOMPRESSION ==========
       else {
-        const { HuffmanCompressor } = await import('./lib/huffman.js');
+        const { HuffmanCompressor } = await import("./lib/huffman.js");
         const compressor = new HuffmanCompressor();
 
         setProgress(30);
@@ -131,14 +140,14 @@ function App() {
         const fileContent = await new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = (e) => resolve(e.target.result);
-          reader.onerror = () => reject(new Error('Failed to read file'));
-          if (actualMode === 'compress') reader.readAsText(file);
+          reader.onerror = () => reject(new Error("Failed to read file"));
+          if (actualMode === "compress") reader.readAsText(file);
           else reader.readAsArrayBuffer(file);
         });
 
         setProgress(50);
 
-        if (actualMode === 'compress') {
+        if (actualMode === "compress") {
           const compressed = compressor.compress(fileContent);
 
           const frequency = compressor.buildFrequencyMap(fileContent);
@@ -154,7 +163,7 @@ function App() {
           );
 
           result = {
-            fileName: file.name.replace(/\.[^/.]+$/, '') + '.huff',
+            fileName: file.name.replace(/\.[^/.]+$/, "") + ".huff",
             originalSize: file.size,
             compressedSize: compressedFile.actualSize,
             compressionRatio: compressed.compressionRatio,
@@ -165,7 +174,8 @@ function App() {
           const buffer = fileContent;
 
           try {
-            const { encodedText, metadata } = compressor.readCompressedFile(buffer);
+            const { encodedText, metadata } =
+              compressor.readCompressedFile(buffer);
             const decompressedText = compressor.decompress(
               encodedText,
               metadata.tree,
@@ -174,7 +184,7 @@ function App() {
 
             result = {
               fileName:
-                metadata.originalName || file.name.replace('.huff', '.txt'),
+                metadata.originalName || file.name.replace(".huff", ".txt"),
               originalSize: file.size,
               compressedSize: decompressedText.length,
               compressionRatio: (
@@ -186,7 +196,7 @@ function App() {
             };
           } catch (decompressError) {
             throw new Error(
-              'Failed to decompress file: ' + decompressError.message
+              "Failed to decompress file: " + decompressError.message
             );
           }
         }
@@ -196,25 +206,25 @@ function App() {
 
       // ========== CREATE DOWNLOAD ==========
       let blob, downloadUrl;
-      if (result.isImage && actualMode === 'decompress-image') {
+      if (result.isImage && actualMode === "decompress-image") {
         blob = result.fileContent;
         downloadUrl = result.imageUrl;
       } else {
         const blobType =
-          actualMode === 'compress' || actualMode === 'compress-image'
-            ? 'application/octet-stream'
+          actualMode === "compress" || actualMode === "compress-image"
+            ? "application/octet-stream"
             : result.isImage
-            ? 'image/png'
-            : 'text/plain';
+            ? "image/png"
+            : "text/plain";
         blob = new Blob([result.fileContent], { type: blobType });
         downloadUrl = URL.createObjectURL(blob);
       }
 
       setResult({ ...result, downloadUrl, mode: actualMode });
-      setStatus('success');
+      setStatus("success");
       setProgress(100);
 
-      if (actualMode === 'compress' || actualMode === 'compress-image') {
+      if (actualMode === "compress" || actualMode === "compress-image") {
         saveToHistory({
           fileName: file.name,
           originalSize: result.originalSize,
@@ -225,9 +235,9 @@ function App() {
         });
       }
     } catch (err) {
-      console.error('Operation failed:', err);
+      console.error("Operation failed:", err);
       setError(err.message || `${getActualMode()} failed`);
-      setStatus('error');
+      setStatus("error");
     } finally {
       setLoading(false);
     }
@@ -236,16 +246,16 @@ function App() {
   const handleDownload = () => {
     if (result && result.fileContent) {
       const fileType =
-        mode === 'compress' ? 'application/octet-stream' : 'text/plain';
+        mode === "compress" ? "application/octet-stream" : "text/plain";
       const fileName =
         result.fileName ||
-        (mode === 'compress'
-          ? (file?.name?.replace(/\.[^/.]+$/, '') || 'compressed') + '.huff'
-          : (file?.name?.replace(/\.huff$/, '') || 'decompressed') + '.txt');
+        (mode === "compress"
+          ? (file?.name?.replace(/\.[^/.]+$/, "") || "compressed") + ".huff"
+          : (file?.name?.replace(/\.huff$/, "") || "decompressed") + ".txt");
 
       const blob = new Blob([result.fileContent], { type: fileType });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = fileName;
       document.body.appendChild(a);
@@ -257,7 +267,7 @@ function App() {
 
   const handleRetry = () => {
     setError(null);
-    setStatus('idle');
+    setStatus("idle");
     setProgress(0);
   };
 
@@ -270,39 +280,41 @@ function App() {
           {/* ===== FILE TYPE SELECTOR ===== */}
           <div
             className="file-type-selector"
-            style={{ marginBottom: '20px', textAlign: 'center' }}
+            style={{ marginBottom: "20px", textAlign: "center" }}
           >
             <div
               style={{
-                marginBottom: '10px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: 'var(--text-secondary)',
+                marginBottom: "10px",
+                fontSize: "14px",
+                fontWeight: "500",
+                color: "var(--text-secondary)",
               }}
             >
               Select file type:
             </div>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+            <div
+              style={{ display: "flex", gap: "12px", justifyContent: "center" }}
+            >
               <button
-                className={`mode-btn ${fileType === 'text' ? 'active' : ''}`}
+                className={`mode-btn ${fileType === "text" ? "active" : ""}`}
                 onClick={() => {
-                  setFileType('text');
+                  setFileType("text");
                   setFile(null);
                   setResult(null);
                   setError(null);
-                  setStatus('idle');
+                  setStatus("idle");
                 }}
               >
                 Text
               </button>
               <button
-                className={`mode-btn ${fileType === 'image' ? 'active' : ''}`}
+                className={`mode-btn ${fileType === "image" ? "active" : ""}`}
                 onClick={() => {
-                  setFileType('image');
+                  setFileType("image");
                   setFile(null);
                   setResult(null);
                   setError(null);
-                  setStatus('idle');
+                  setStatus("idle");
                 }}
               >
                 Image
@@ -313,25 +325,25 @@ function App() {
           {/* ===== MODE SELECTOR ===== */}
           <div className="mode-selector">
             <button
-              className={`mode-btn ${mode === 'compress' ? 'active' : ''}`}
+              className={`mode-btn ${mode === "compress" ? "active" : ""}`}
               onClick={() => {
-                setMode('compress');
+                setMode("compress");
                 setFile(null);
                 setResult(null);
                 setError(null);
-                setStatus('idle');
+                setStatus("idle");
               }}
             >
               Compress
             </button>
             <button
-              className={`mode-btn ${mode === 'decompress' ? 'active' : ''}`}
+              className={`mode-btn ${mode === "decompress" ? "active" : ""}`}
               onClick={() => {
-                setMode('decompress');
+                setMode("decompress");
                 setFile(null);
                 setResult(null);
                 setError(null);
-                setStatus('idle');
+                setStatus("idle");
               }}
             >
               Decompress
@@ -345,7 +357,11 @@ function App() {
             selectedFile={file}
           />
 
-          <StatusCard status={status} progress={progress} onRetry={handleRetry} />
+          <StatusCard
+            status={status}
+            progress={progress}
+            onRetry={handleRetry}
+          />
 
           {error && <div className="error-message">{error}</div>}
 
@@ -354,13 +370,13 @@ function App() {
               <button
                 className="submit-btn"
                 onClick={handleSubmit}
-                disabled={loading || status === 'error'}
+                disabled={loading || status === "error"}
               >
                 {loading
-                  ? 'Processing...'
-                  : mode === 'compress'
-                  ? `Compress ${fileType === 'image' ? 'Image' : 'Text'}`
-                  : `Decompress ${fileType === 'image' ? 'Image' : 'Text'}`}
+                  ? "Processing..."
+                  : mode === "compress"
+                  ? `Compress ${fileType === "image" ? "Image" : "Text"}`
+                  : `Decompress ${fileType === "image" ? "Image" : "Text"}`}
               </button>
             </div>
           )}
@@ -383,40 +399,55 @@ function App() {
                 Download File
               </button>
 
-              {huffmanTree && huffmanCodes && fileType === 'text' && mode === 'compress' && (
-                <button
-                  className={`visualization-toggle ${showVisualization ? 'open' : ''}`}
-                  onClick={() => setShowVisualization(!showVisualization)}
-                >
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    className="toggle-icon"
+              {huffmanTree &&
+                huffmanCodes &&
+                fileType === "text" &&
+                mode === "compress" && (
+                  <button
+                    className={`visualization-toggle ${
+                      showVisualization ? "open" : ""
+                    }`}
+                    onClick={() => setShowVisualization(!showVisualization)}
                   >
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
-                  {showVisualization ? 'Hide Visualization' : 'Show Code Table'}
-                </button>
-              )}
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="toggle-icon"
+                    >
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                    {showVisualization
+                      ? "Hide Visualization"
+                      : "Show Code Table"}
+                  </button>
+                )}
             </div>
           )}
         </div>
 
-        {huffmanTree && huffmanCodes && fileType === 'text' && mode === 'compress' && showVisualization && (
-          <CodeTable codes={huffmanCodes} isVisible={showVisualization} />
-        )}
+        {huffmanTree &&
+          huffmanCodes &&
+          fileType === "text" &&
+          mode === "compress" &&
+          showVisualization && (
+            <CodeTable codes={huffmanCodes} isVisible={showVisualization} />
+          )}
 
         <div className="info-box card">
           <h3>About Huffman Coding</h3>
           <p>
-            Huffman coding is a data compression algorithm that assigns variable-length codes to input data, with shorter codes for more frequent elements.
+            Huffman coding is a data compression algorithm that assigns
+            variable-length codes to input data, with shorter codes for more
+            frequent elements.
           </p>
           <p>
-            This application allows you to compress both <strong>text files</strong> (lossless) and <strong>images</strong> (lossy with color quantization) using Huffman coding.
+            This application allows you to compress both{" "}
+            <strong>text files</strong> (lossless) and <strong>images</strong>{" "}
+            (lossy with color quantization) using Huffman coding.
           </p>
         </div>
 
@@ -427,10 +458,19 @@ function App() {
               {history.slice(0, 5).map((item, index) => (
                 <div key={index} className="history-item">
                   <div className="history-item-info">
-                    <div className="history-item-name">{item.fileName || 'Unknown file'}</div>
+                    <div className="history-item-name">
+                      {item.fileName || "Unknown file"}
+                    </div>
                     <div className="history-item-stats">
-                      {formatBytes(item.originalSize || 0)} → {formatBytes(item.compressedSize || 0)} 
-                      ({item.originalSize && item.compressedSize ? ((1 - item.compressedSize / item.originalSize) * 100).toFixed(2) : '0.00'}%)
+                      {formatBytes(item.originalSize || 0)} →{" "}
+                      {formatBytes(item.compressedSize || 0)}(
+                      {item.originalSize && item.compressedSize
+                        ? (
+                            (1 - item.compressedSize / item.originalSize) *
+                            100
+                          ).toFixed(2)
+                        : "0.00"}
+                      %)
                     </div>
                   </div>
                 </div>

@@ -36,7 +36,10 @@ class ImageMinHeap {
       const parentIndex = Math.floor((index - 1) / 2);
       if (this.heap[index].frequency >= this.heap[parentIndex].frequency) break;
 
-      [this.heap[index], this.heap[parentIndex]] = [this.heap[parentIndex], this.heap[index]];
+      [this.heap[index], this.heap[parentIndex]] = [
+        this.heap[parentIndex],
+        this.heap[index],
+      ];
       index = parentIndex;
     }
   }
@@ -47,14 +50,23 @@ class ImageMinHeap {
       const rightChild = 2 * index + 2;
       let smallest = index;
 
-      if (leftChild < this.heap.length && this.heap[leftChild].frequency < this.heap[smallest].frequency)
+      if (
+        leftChild < this.heap.length &&
+        this.heap[leftChild].frequency < this.heap[smallest].frequency
+      )
         smallest = leftChild;
-      if (rightChild < this.heap.length && this.heap[rightChild].frequency < this.heap[smallest].frequency)
+      if (
+        rightChild < this.heap.length &&
+        this.heap[rightChild].frequency < this.heap[smallest].frequency
+      )
         smallest = rightChild;
 
       if (smallest === index) break;
 
-      [this.heap[index], this.heap[smallest]] = [this.heap[smallest], this.heap[index]];
+      [this.heap[index], this.heap[smallest]] = [
+        this.heap[smallest],
+        this.heap[index],
+      ];
       index = smallest;
     }
   }
@@ -143,11 +155,14 @@ class HuffmanImageCompressor {
   buildHuffmanTree(freqMap) {
     if (freqMap.size === 0) return null;
     const heap = new ImageMinHeap();
-    for (const [value, freq] of freqMap.entries()) heap.insert(new HuffmanNode(value, freq));
+    for (const [value, freq] of freqMap.entries())
+      heap.insert(new HuffmanNode(value, freq));
     while (heap.size() > 1) {
       const left = heap.extractMin();
       const right = heap.extractMin();
-      heap.insert(new HuffmanNode(null, left.frequency + right.frequency, left, right));
+      heap.insert(
+        new HuffmanNode(null, left.frequency + right.frequency, left, right)
+      );
     }
     return heap.extractMin();
   }
@@ -166,7 +181,11 @@ class HuffmanImageCompressor {
   serializeTree(node) {
     if (!node) return [];
     if (node.value !== null) return [{ leaf: true, value: node.value }];
-    return [{ leaf: false }, ...this.serializeTree(node.left), ...this.serializeTree(node.right)];
+    return [
+      { leaf: false },
+      ...this.serializeTree(node.left),
+      ...this.serializeTree(node.right),
+    ];
   }
 
   deserializeTree(serialized) {
@@ -255,8 +274,12 @@ class HuffmanImageCompressor {
     const bChannel = processChannel(deltaB);
     const aChannel = processChannel(deltaA);
 
-    const fileExtMatch = file.name.match(/\.(png|jpg|jpeg|bmp|tiff|tif|webp)$/i);
-    const originalExtension = fileExtMatch ? fileExtMatch[1].toLowerCase() : "png";
+    const fileExtMatch = file.name.match(
+      /\.(png|jpg|jpeg|bmp|tiff|tif|webp)$/i
+    );
+    const originalExtension = fileExtMatch
+      ? fileExtMatch[1].toLowerCase()
+      : "png";
 
     const metadata = {
       magic: "HUFFIMG",
@@ -264,7 +287,10 @@ class HuffmanImageCompressor {
       width,
       height,
       channels: 4,
-      originalName: file.name.replace(/\.(png|jpg|jpeg|bmp|tiff|tif|webp)$/i, ""),
+      originalName: file.name.replace(
+        /\.(png|jpg|jpeg|bmp|tiff|tif|webp)$/i,
+        ""
+      ),
       originalExtension,
       originalFileSize: uploadedFileSize,
       rTree: rChannel.tree,
@@ -290,9 +316,12 @@ class HuffmanImageCompressor {
     const metadataLength = metadataBytes.length;
 
     const totalLength =
-      4 + metadataLength +
-      rChannel.bytes.length + gChannel.bytes.length +
-      bChannel.bytes.length + aChannel.bytes.length;
+      4 +
+      metadataLength +
+      rChannel.bytes.length +
+      gChannel.bytes.length +
+      bChannel.bytes.length +
+      aChannel.bytes.length;
 
     const result = new Uint8Array(totalLength);
     let offset = 0;
@@ -310,7 +339,10 @@ class HuffmanImageCompressor {
 
     const originalSize = uploadedFileSize;
     const compressedSize = result.length;
-    const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(2);
+    const compressionRatio = (
+      (1 - compressedSize / originalSize) *
+      100
+    ).toFixed(2);
 
     return {
       data: result,
@@ -334,8 +366,10 @@ class HuffmanImageCompressor {
           const metadataJson = new TextDecoder().decode(metadataBytes);
           const metadata = JSON.parse(metadataJson);
 
-          if (metadata.magic !== "HUFFIMG") throw new Error("Invalid .huffimg file format");
-          if (metadata.version !== 1) throw new Error(`Unsupported file version: ${metadata.version}`);
+          if (metadata.magic !== "HUFFIMG")
+            throw new Error("Invalid .huffimg file format");
+          if (metadata.version !== 1)
+            throw new Error(`Unsupported file version: ${metadata.version}`);
 
           const offset = 4 + metadataLength;
           const remainingData = data.slice(offset);
@@ -346,12 +380,22 @@ class HuffmanImageCompressor {
             metadata.aByteLength;
 
           if (remainingData.length < totalBytes)
-            throw new Error(`Corrupted file: expected ${totalBytes} bytes, got ${remainingData.length}`);
+            throw new Error(
+              `Corrupted file: expected ${totalBytes} bytes, got ${remainingData.length}`
+            );
 
           const rBytes = remainingData.slice(0, metadata.rByteLength);
-          const gBytes = remainingData.slice(metadata.rByteLength, metadata.rByteLength + metadata.gByteLength);
-          const bBytes = remainingData.slice(metadata.rByteLength + metadata.gByteLength, metadata.rByteLength + metadata.gByteLength + metadata.bByteLength);
-          const aBytes = remainingData.slice(metadata.rByteLength + metadata.gByteLength + metadata.bByteLength);
+          const gBytes = remainingData.slice(
+            metadata.rByteLength,
+            metadata.rByteLength + metadata.gByteLength
+          );
+          const bBytes = remainingData.slice(
+            metadata.rByteLength + metadata.gByteLength,
+            metadata.rByteLength + metadata.gByteLength + metadata.bByteLength
+          );
+          const aBytes = remainingData.slice(
+            metadata.rByteLength + metadata.gByteLength + metadata.bByteLength
+          );
 
           const rTree = this.deserializeTree(metadata.rTree);
           const gTree = this.deserializeTree(metadata.gTree);
@@ -385,7 +429,9 @@ class HuffmanImageCompressor {
             );
           }
 
-          const imageData = new Uint8ClampedArray(metadata.width * metadata.height * 4);
+          const imageData = new Uint8ClampedArray(
+            metadata.width * metadata.height * 4
+          );
           for (let i = 0; i < expectedPixelCount; i++) {
             imageData[i * 4] = Math.max(0, Math.min(255, channelR[i]));
             imageData[i * 4 + 1] = Math.max(0, Math.min(255, channelG[i]));
@@ -397,7 +443,11 @@ class HuffmanImageCompressor {
           canvas.width = metadata.width;
           canvas.height = metadata.height;
           const ctx = canvas.getContext("2d");
-          ctx.putImageData(new ImageData(imageData, metadata.width, metadata.height), 0, 0);
+          ctx.putImageData(
+            new ImageData(imageData, metadata.width, metadata.height),
+            0,
+            0
+          );
 
           const outputExtension = metadata.originalExtension || "png";
           const extensionToMimeType = {
@@ -410,7 +460,9 @@ class HuffmanImageCompressor {
             webp: "image/webp",
           };
           const mimeType = extensionToMimeType[outputExtension] || "image/png";
-          const quality = ["jpg", "jpeg", "webp"].includes(outputExtension) ? 0.95 : undefined;
+          const quality = ["jpg", "jpeg", "webp"].includes(outputExtension)
+            ? 0.95
+            : undefined;
 
           canvas.toBlob(
             (blob) => {

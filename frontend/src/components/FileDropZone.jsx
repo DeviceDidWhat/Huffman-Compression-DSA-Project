@@ -8,7 +8,7 @@ const FileDropZone = ({ onFileSelect, disabled, mode, selectedFile }) => {
   const handleDragEnter = (e) => {
     e.preventDefault();
     if (!disabled) {
-      setDragCounter(prev => prev + 1);
+      setDragCounter((prev) => prev + 1);
       setIsDragOver(true);
     }
   };
@@ -21,7 +21,7 @@ const FileDropZone = ({ onFileSelect, disabled, mode, selectedFile }) => {
   const handleDragLeave = (e) => {
     e.preventDefault();
     if (!disabled) {
-      setDragCounter(prev => {
+      setDragCounter((prev) => {
         const newCounter = prev - 1;
         if (newCounter === 0) {
           setIsDragOver(false);
@@ -75,7 +75,8 @@ const FileDropZone = ({ onFileSelect, disabled, mode, selectedFile }) => {
               <div className="overlay-badge">
                 {mode === "compress" && "Text File (.txt)"}
                 {mode === "decompress" && "Compressed File (.huff)"}
-                {mode === "compress-image" && "Image File (.png, .jpg, .bmp, .tiff, .webp)"}
+                {mode === "compress-image" &&
+                  "Image File (.png, .jpg, .bmp, .tiff, .webp)"}
                 {mode === "decompress-image" && "Compressed Image (.huffimg)"}
               </div>
             </div>
@@ -149,9 +150,7 @@ const FileDropZone = ({ onFileSelect, disabled, mode, selectedFile }) => {
                 </>
               ) : (
                 <>
-                  <h3 className="dropzone-title">
-                    Drag and drop your file
-                  </h3>
+                  <h3 className="dropzone-title">Drag and drop your file</h3>
                   <p className="dropzone-subtitle">
                     or click to <span className="browse-text">browse</span>
                   </p>
