@@ -35,13 +35,13 @@ export const validateFile = (file, mode) => {
   } else if (mode === "decompress" && !file.name.endsWith(".huff")) {
     throw new Error("Please select a .huff file for decompression");
   } else if (mode === "compress-image") {
-    const validImageTypes = [".png", ".jpg", ".jpeg"];
+    const validImageTypes = [".png", ".jpg", ".jpeg", ".bmp", ".tiff", ".tif", ".webp"];
     const hasValidExtension = validImageTypes.some((ext) =>
       file.name.toLowerCase().endsWith(ext)
     );
     if (!hasValidExtension) {
       throw new Error(
-        "Please select a .png, .jpg, or .jpeg file for image compression"
+        "Please select a valid image file (.png, .jpg, .jpeg, .bmp, .tiff, .tif, .webp) for compression"
       );
     }
   } else if (mode === "decompress-image" && !file.name.endsWith(".huffimg")) {

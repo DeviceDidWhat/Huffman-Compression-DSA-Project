@@ -75,7 +75,7 @@ const FileDropZone = ({ onFileSelect, disabled, mode, selectedFile }) => {
               <div className="overlay-badge">
                 {mode === "compress" && "Text File (.txt)"}
                 {mode === "decompress" && "Compressed File (.huff)"}
-                {mode === "compress-image" && "Image File (.png, .jpg, .jpeg)"}
+                {mode === "compress-image" && "Image File (.png, .jpg, .bmp, .tiff, .webp)"}
                 {mode === "decompress-image" && "Compressed Image (.huffimg)"}
               </div>
             </div>
@@ -93,7 +93,7 @@ const FileDropZone = ({ onFileSelect, disabled, mode, selectedFile }) => {
               : mode === "decompress"
               ? ".huff"
               : mode === "compress-image"
-              ? ".png,.jpg,.jpeg,image/png,image/jpeg"
+              ? ".png,.jpg,.jpeg,.bmp,.tiff,.tif,.webp,image/png,image/jpeg,image/bmp,image/tiff,image/webp"
               : ".huffimg"
           }
           onChange={handleFileChange}
@@ -171,7 +171,9 @@ const FileDropZone = ({ onFileSelect, disabled, mode, selectedFile }) => {
                   <>
                     <span className="file-type-badge">.png</span>
                     <span className="file-type-badge">.jpg</span>
-                    <span className="file-type-badge">.jpeg</span>
+                    <span className="file-type-badge">.bmp</span>
+                    <span className="file-type-badge">.tiff</span>
+                    <span className="file-type-badge">.webp</span>
                   </>
                 )}
                 {mode === "decompress-image" && (
