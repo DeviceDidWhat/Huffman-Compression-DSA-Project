@@ -10,7 +10,11 @@ const FileInfoDisplay = ({
   imageUrl,
   width,
   height,
+  mode,
+  originalFileSize,
 }) => {
+  const isDecompression = mode === "decompress" || mode === "decompress-image";
+
   const compressionRatio = compressedSize
     ? ((1 - compressedSize / fileSize) * 100).toFixed(2)
     : 0;
@@ -82,7 +86,9 @@ const FileInfoDisplay = ({
         <div className="info-card">
           <div className="info-card-icon">📊</div>
           <div className="info-card-content">
-            <span className="info-label">Original Size</span>
+            <span className="info-label">
+              {isDecompression ? "Compressed File Size" : "Original Size"}
+            </span>
             <span className="info-value">{formatBytes(fileSize)}</span>
           </div>
         </div>
@@ -90,26 +96,42 @@ const FileInfoDisplay = ({
         {compressedSize > 0 && (
           <>
             <div className="info-card">
-              <div className="info-card-icon">🗜️</div>
+              <div className="info-card-icon">🗜</div>
               <div className="info-card-content">
-                <span className="info-label">Compressed Size</span>
+                <span className="info-label">
+                  {isDecompression ? "Decompressed Size" : "Compressed Size"}
+                </span>
                 <span className="info-value">
                   {formatBytes(compressedSize)}
                 </span>
               </div>
             </div>
 
-            <div className="info-card highlight-card">
-              <div className="info-card-icon">⚡</div>
-              <div className="info-card-content">
-                <span className="info-label">Space Saved</span>
-                <span className="info-value highlight-value">
-                  {compressionRatio}%
-                </span>
+            {!isDecompression && (
+              <div className="info-card highlight-card">
+                <div className="info-card-icon">⚡</div>
+                <div className="info-card-content">
+                  <span className="info-label">Space Saved</span>
+                  <span className="info-value highlight-value">
+                    {compressionRatio}%
+                  </span>
+                </div>
+                <div className="sparkle sparkle-1"></div>
+                <div className="sparkle sparkle-2"></div>
               </div>
-              <div className="sparkle sparkle-1"></div>
-              <div className="sparkle sparkle-2"></div>
-            </div>
+            )}
+
+            {isDecompression && originalFileSize && (
+              <div className="info-card">
+                <div className="info-card-icon">📦</div>
+                <div className="info-card-content">
+                  <span className="info-label">Original File Size</span>
+                  <span className="info-value">
+                    {formatBytes(originalFileSize)}
+                  </span>
+                </div>
+              </div>
+            )}
 
             {newFileName && (
               <div className="info-card full-width">
@@ -124,7 +146,7 @@ const FileInfoDisplay = ({
         )}
       </div>
 
-      {compressedSize > 0 && (
+      {compressedSize > 0 && !isDecompression && (
         <div className="compression-visual">
           <div className="visual-bar">
             <div className="original-bar">
@@ -132,7 +154,9 @@ const FileInfoDisplay = ({
             </div>
             <div
               className="compressed-bar"
-              style={{ width: `${100 - parseFloat(compressionRatio)}%` }}
+              style={{
+                width: `${100 - parseFloat(compressionRatio)}%`,
+              }}
             >
               <span className="bar-label">Compressed</span>
             </div>
