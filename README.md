@@ -160,7 +160,6 @@ Huffman-Compression-DSA-Project/
 │   │   ├── App.jsx                     # Main application container
 │   │   └── main.jsx                    # Entry point
 │   └── package.json
-├── CLAUDE.md                           # Project documentation for Claude Code
 ├── LICENSE
 └── README.md
 ```
