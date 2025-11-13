@@ -244,7 +244,7 @@ Contributions are welcome! To contribute:
 
 ## License
 
-This project is licensed under the (MIT LICENSE)[LICENSE]
+This project is licensed under the [MIT LICENSE](LICENSE)
 
 ## Acknowledgments
 
